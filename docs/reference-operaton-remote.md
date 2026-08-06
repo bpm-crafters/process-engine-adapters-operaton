@@ -1,5 +1,5 @@
 ---
-title: Process Engine Adapter C7 Remote
+title: Process Engine Adapter Operaton Remote
 ---
 
 # Decisions and supported features
@@ -8,7 +8,8 @@ title: Process Engine Adapter C7 Remote
 
 All remote adapter properties use the prefix `dev.bpm-crafters.process-api.adapter.operaton-remote`.
 
-The remote starter expects a Camunda 7 REST client library on the classpath. The official Camunda external task client is optional and only needed when service tasks use subscribed delivery.
+The remote starter expects a REST client library for Operaton's Camunda-7-compatible REST API on the classpath. The
+official Operaton external task client is optional and only needed when service tasks use subscribed delivery.
 
 ### Classpath options
 
@@ -16,37 +17,29 @@ The remote starter expects a Camunda 7 REST client library on the classpath. The
 |----------|-----------------------|
 | Remote adapter in general | `process-engine-adapter-operaton-remote-spring-boot-starter` plus a Feign-based Camunda 7 REST client starter |
 | Service tasks with `remote_scheduled` | Same as above |
-| Service tasks with `remote_subscribed` | Same as above, plus `org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-external-task-client:7.24.0` |
+| Service tasks with `remote_subscribed` | Same as above, plus `org.operaton.bpm.springboot:operaton-bpm-spring-boot-starter-external-task-client:2.1.3` |
 
-For Spring Boot 3.x the examples use:
-
-```xml
-<dependency>
-  <groupId>io.holunda.c7</groupId>
-  <artifactId>c7-rest-client-spring-boot-starter-feign</artifactId>
-  <version>${c7.version}</version>
-</dependency>
-```
-
-For Spring Boot 4 use the Boot-4 specific variant:
+The adapter targets Spring Boot 4, so use the Boot-4 variant of the community REST client starter:
 
 ```xml
 <dependency>
   <groupId>io.holunda.c7</groupId>
   <artifactId>c7-rest-client-spring-boot-starter-feign-4</artifactId>
-  <version>${c7.version}</version>
+  <version>${c7-rest-client.version}</version>
 </dependency>
 ```
+
+The community REST client is built for Camunda 7; it works against Operaton because Operaton exposes a
+Camunda-7-compatible REST API under `/engine-rest`.
 
 ### Jackson compatibility
 
 The remote adapter starter supports both Jackson 2 and Jackson 3 for adapter-side serialization.
 
-- Spring Boot 3 applications typically resolve to Jackson 2.
 - Spring Boot 4 applications typically resolve to Jackson 3.
-- The remote adapter does not require embedded Camunda Spin, so the embedded Spin limitation does not apply to the adapter runtime here.
+- The remote adapter does not require embedded Spin, so the embedded Spin limitation does not apply to the adapter runtime here.
 
-That means Jackson 3 is a supported and expected choice for remote Spring Boot 4 applications. If the remote Camunda 7
+That means Jackson 3 is a supported and expected choice for remote Spring Boot 4 applications. If the remote Operaton
 engine itself uses Spin for JSON variables, that remains a concern of the remote engine runtime, not of the adapter
 starter.
 
@@ -56,9 +49,9 @@ starter.
 |-------|--------------|--------------------------|
 | Delivery strategy | `remote_scheduled` | `remote_subscribed` |
 | Classpath | Requires the Feign REST client starter | Requires the Feign REST client starter and the official external task client starter |
-| Service-task delivery | Adapter polls `/external-task/fetchAndLock` on its own schedule | Camunda client keeps topic subscriptions open and receives tasks through its own worker runtime |
-| Service-task completion | Uses `ExternalTaskApiClient` through the REST client | Uses `ExternalTaskClient` / `ExternalTaskService` from Camunda |
-| YAML for engine URL | `feign.client.config.default.url` | `camunda.bpm.client.base-url` in addition to `feign.client.config.default.url` |
+| Service-task delivery | Adapter polls `/external-task/fetchAndLock` on its own schedule | Operaton client keeps topic subscriptions open and receives tasks through its own worker runtime |
+| Service-task completion | Uses `ExternalTaskApiClient` through the REST client | Uses `ExternalTaskClient` / `ExternalTaskService` from Operaton |
+| YAML for engine URL | `feign.client.config.default.url` | `operaton.bpm.client.base-url` in addition to `feign.client.config.default.url` |
 | Scope in this adapter | Used by the remote adapter's REST-based APIs, including scheduled service-task and user-task delivery | Used only by subscribed service-task delivery |
 
 ### Minimal YAML
@@ -106,7 +99,7 @@ feign:
       default:
         url: "http://localhost:9090/engine-rest/"
 
-camunda:
+operaton:
   bpm:
     client:
       base-url: "http://localhost:9090/engine-rest/"
@@ -127,7 +120,7 @@ camunda:
 | Value | Effect |
 |-------|--------|
 | `remote_scheduled` | Polls external tasks over REST with the Feign-based client. |
-| `remote_subscribed` | Uses the official Camunda external task client and topic subscriptions. |
+| `remote_subscribed` | Uses the official Operaton external task client and topic subscriptions. |
 | `custom` | Disables the built-in recurring delivery. Provide your own delivery and matching service-task completion bean if needed. |
 | `disabled` | Disables service-task delivery and configures a no-op service-task completion API. |
 
@@ -149,7 +142,7 @@ Turns the remote adapter on or off. Default: `false`.
 | `delivery-strategy` | required | One of `remote_scheduled`, `remote_subscribed`, `custom`, `disabled`. |
 | `schedule-delivery-fixed-rate-in-seconds` | `13` | Polling interval for `remote_scheduled`. |
 | `execute-initial-pull-on-startup` | `true` in property binding | Enable one startup pull before the recurring scheduler or subscriber takes over. Set it explicitly when you want startup delivery. |
-| `deserialize-on-server` | `false` | Requests Camunda REST variable deserialization on the server side for scheduled pulls. |
+| `deserialize-on-server` | `false` | Requests REST variable deserialization on the server side for scheduled pulls. |
 | `worker-thread-pool-size` | `10` | Thread pool size for scheduled service-task worker execution. |
 | `worker-thread-pool-queue-capacity` | `50` | Queue capacity for scheduled service-task worker execution. |
 
@@ -160,7 +153,7 @@ Turns the remote adapter on or off. Default: `false`.
 | `delivery-strategy` | required | One of `remote_scheduled`, `custom`, `disabled`. |
 | `schedule-delivery-fixed-rate-in-seconds` | `5` | Polling interval for `remote_scheduled`. |
 | `execute-initial-pull-on-startup` | `true` in property binding | Enable one startup pull before the recurring scheduler takes over. Set it explicitly when you want startup delivery. |
-| `deserialize-on-server` | `false` | Requests Camunda REST variable deserialization on the server side for user-task polling. |
+| `deserialize-on-server` | `false` | Requests REST variable deserialization on the server side for user-task polling. |
 
 ### Example with explicit scheduling settings
 
@@ -207,7 +200,7 @@ Correlation API implementation support the following restrictions:
 
 ## Task Information
 
-Currently, the Process Engine Adapter C7 Remote supports the following values in task information meta block, mapped from the Camunda C7 engine:
+Currently, the Process Engine Adapter Operaton Remote supports the following values in task information meta block, mapped from the Operaton engine:
 
 The `TaskInformation.getMeta()` provides meta information about the task in form of a `Map<String, String>` for maximum compatibility. The Original Type column denotes
 the real type, you want to access if reading the field. For this purpose, `TaskInformation` offers special access methods `getMetaValueAsOffsetDate` and `getMetaValueAsStringSet`.

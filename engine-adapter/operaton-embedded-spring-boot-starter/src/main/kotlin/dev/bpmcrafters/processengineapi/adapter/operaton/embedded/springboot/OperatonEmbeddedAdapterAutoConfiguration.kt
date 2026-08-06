@@ -45,11 +45,11 @@ import java.util.concurrent.Executors
 private val logger = KotlinLogging.logger {}
 
 /**
- * Registers the BPM Crafters API beans that adapt the in-process Camunda 7 engine services.
+ * Registers the BPM Crafters API beans that adapt the in-process Operaton engine services.
  *
  * The class is declared as an auto-configuration because it is listed in
  * `AutoConfiguration.imports`; the adapter enabled condition intentionally applies only to these
- * adapter-facing beans, not to the separate Camunda Spring Boot 4 compatibility configuration.
+ * adapter-facing beans, not to Operaton's own engine auto-configuration.
  */
 @AutoConfiguration
 @EnableConfigurationProperties(value = [OperatonEmbeddedAdapterProperties::class])

@@ -10,7 +10,7 @@ import java.util.concurrent.ForkJoinPool
  * mirroring the behavior of a remote engine.
  *
  * This design choice was made on purpose to keep adapters portable across engine implementations
- * (embedded ↔ remote, Camunda 7 ↔ Zeebe).
+ * (embedded ↔ remote, Operaton ↔ Zeebe).
  *
  * However, engine calls do not join the caller's transaction — a rollback triggered elsewhere
  * will not undo what the engine already executed, risking data inconsistencies between your service and the engine.

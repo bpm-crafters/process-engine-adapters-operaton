@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit
 
 
 /**
- * Abstract JGiven stage for implementing BDD tests operating on  Camunda 7 Embedded.
+ * Abstract JGiven stage for implementing BDD tests operating on Operaton Embedded.
  * @param SUBTYPE type of your stage, subclassing this one.
  */
 abstract class AbstractOperatonEmbeddedStage<SUBTYPE : AbstractOperatonEmbeddedStage<SUBTYPE>> : Stage<SUBTYPE>() {

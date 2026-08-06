@@ -9,7 +9,7 @@
 
   <artifactId>process-engine-adapter-operaton-bom</artifactId>
   <name>BOM: ${project.artifactId}</name>
-  <description>Bill of Materials for Process Engine Camunda 7 Adapters.</description>
+  <description>Bill of Materials for Process Engine Operaton Adapters.</description>
   <packaging>pom</packaging>
 
   <dependencyManagement>

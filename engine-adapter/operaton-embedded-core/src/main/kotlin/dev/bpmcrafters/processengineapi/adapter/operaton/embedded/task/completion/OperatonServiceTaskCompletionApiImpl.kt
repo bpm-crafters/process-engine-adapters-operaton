@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
 private val logger = KotlinLogging.logger {}
 
 /**
- * Strategy for completing external tasks using Camunda externalTaskService Java API.
+ * Strategy for completing external tasks using Operaton externalTaskService Java API.
  */
 class OperatonServiceTaskCompletionApiImpl(
   private val workerId: String,

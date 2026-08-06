@@ -30,7 +30,7 @@ Ignore generated build output under `target/`; those directories are checked int
 
 ## 3. Working Agreements
 
-- Respond in English; keep Java, Kotlin, Maven, Spring Boot, Camunda, and API terms in English.
+- Respond in English; keep Java, Kotlin, Maven, Spring Boot, Operaton, and API terms in English.
 - Before editing, inspect the matching embedded/remote or core/starter counterpart so changes follow existing symmetry instead of drifting module behavior.
 - Prefer small, module-scoped changes; do not introduce new abstraction layers or compatibility shims unless the task explicitly requires them.
 - Place new code beside the existing concern-based packages and follow established suffixes such as `*ApiImpl`, `*AutoConfiguration`, `*Properties`, `*Condition`, `*ITest`, and `*Test`.

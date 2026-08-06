@@ -1,12 +1,12 @@
 ---
-title: Process Engine Adapter C7 Embedded
+title: Process Engine Adapter Operaton Embedded
 ---
 
 # Decisions and supported features
 
 ## Spring Boot compatibility
 
-The embedded Spring Boot starter supports Spring Boot 3 and Spring Boot 4. For Spring Boot 4, the scheduler
+The embedded Spring Boot starter requires Spring Boot 4, matching the Operaton 2.x Spring Boot starters. The scheduler
 auto-configuration uses adapter-owned threading conditions instead of Spring Boot's removed `Threading.VIRTUAL` and
 `Threading.PLATFORM` enum values.
 
@@ -14,48 +14,41 @@ If `spring.threads.virtual.enabled=true` and the application runs on Java 21 or 
 `SimpleAsyncTaskScheduler` for Spring's default `taskScheduler` bean. Otherwise, it falls back to a
 `ThreadPoolTaskScheduler`.
 
-The public Spring Boot 4 example uses Camunda 7 Community Edition `7.24.0`, the last CE release published on Maven
-Central. Enterprise patch versions require the consuming application to configure Camunda Enterprise repositories and
-versions explicitly.
+The examples use Operaton `2.1.3`, published on Maven Central.
 
-Camunda 7.24's Spring Boot starter still references the Spring Boot 3 Hibernate JPA auto-configuration class
-`org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration`. Under Spring Boot 4, the embedded adapter
-starter filters that Camunda auto-configuration and contributes an equivalent compatibility auto-configuration ordered
-after Spring Boot 4's `org.springframework.boot.hibernate.autoconfigure.HibernateJpaAutoConfiguration`.
-
-The compatibility layer does not replace Camunda runtime dependencies. Embedded Spring Boot 4 applications still need a
-working `DataSource` and transaction manager, for example via `spring-boot-starter-jdbc`. Applications that persist
-custom object variables as JSON should add `camunda-engine-plugin-spin` and
-`camunda-spin-dataformat-json-jackson`; the Spring Boot 4 example uses those dependencies to serialize the sample
-`LocalDateTime` payload.
+Embedded Spring Boot 4 applications need a working `DataSource` and transaction manager, for example via
+`spring-boot-starter-jdbc` — since the Spring Boot 4 module split, the JDBC auto-configurations are not brought in
+transitively by the engine starter. Applications that persist custom object variables as JSON should add
+`operaton-engine-plugin-spin` and `operaton-spin-dataformat-json-jackson`; the Jackson-2 example uses those
+dependencies to serialize the sample `LocalDateTime` payload.
 
 ## Jackson and Spin compatibility
 
 The adapter starter can serialize adapter payloads with either Jackson 2 or Jackson 3, depending on what the
-application provides on the classpath. For embedded Camunda 7, that adapter-level flexibility is narrower once Spin is
+application provides on the classpath. For embedded Operaton, that adapter-level flexibility is narrower once Spin is
 involved.
 
-Camunda Spin's JSON integration is tied to the Jackson 2 ecosystem. Because of that:
+Operaton Spin's JSON integration is tied to the Jackson 2 ecosystem. Because of that:
 
-- Embedded Camunda 7 with Spin JSON serialization must stay on Jackson 2 for the adapter-facing serialization path.
-- Embedded Camunda 7 with Jackson 3 should not use Spin JSON serialization.
-- Embedded Jackson 3 setups should avoid forcing `camunda.bpm.default-serialization-format=application/json` unless they provide a different compatible JSON variable serialization strategy.
+- Embedded Operaton with Spin JSON serialization must stay on Jackson 2 for the adapter-facing serialization path.
+- Embedded Operaton with Jackson 3 should not use Spin JSON serialization.
+- Embedded Jackson 3 setups should avoid forcing `operaton.bpm.default-serialization-format=application/json` unless they provide a different compatible JSON variable serialization strategy.
 - Embedded Jackson 3 can still work when object variables use Java serialization instead of Spin JSON serialization.
 
 The provided examples reflect these supported combinations:
 
-- `examples/java-c7-embedded-sb4`: Spring Boot 4 embedded example with Spin and Jackson 2
-- `examples/java-c7-embedded-sb4-jackson3`: Spring Boot 4 embedded example without Spin and with Jackson 3
+- `examples/java-operaton-embedded`: embedded example with Spin and Jackson 2
+- `examples/java-operaton-embedded-jackson3`: embedded example without Spin and with Jackson 3
 
-If an embedded Boot 4 application accidentally ends up with both Jackson ecosystems on the classpath, the starter
-prefers Jackson 3 by default. When Spin is present, provide an explicit `AdapterDataConverter` bean backed by Jackson 2
-so the adapter matches Spin instead of relying on the default selection.
+If an embedded application ends up with both Jackson ecosystems on the classpath, the starter prefers Jackson 3 by
+default. When Spin is present, provide an explicit `AdapterDataConverter` bean backed by Jackson 2 so the adapter
+matches Spin instead of relying on the default selection.
 
 ## Configuration
 
 All embedded adapter properties use the prefix `dev.bpm-crafters.process-api.adapter.operaton-embedded`.
 
-The adapter starter does not bring an embedded Camunda engine on its own. Add it together with a Camunda 7 embedded setup such as `camunda-bpm-spring-boot-starter` or `camunda-bpm-spring-boot-starter-webapp`.
+The adapter starter does not bring an embedded Operaton engine on its own. Add it together with an Operaton embedded setup such as `operaton-bpm-spring-boot-starter` or `operaton-bpm-spring-boot-starter-webapp`. With the webapp starter, log in with the admin user configured under `operaton.bpm.admin-user` (the examples use `admin` / `admin`).
 
 ### Minimal classpath
 
@@ -64,12 +57,12 @@ The adapter starter does not bring an embedded Camunda engine on its own. Add it
   <dependency>
     <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
     <artifactId>process-engine-adapter-operaton-embedded-spring-boot-starter</artifactId>
-    <version>${process-engine-api.version}</version>
+    <version>${process-engine-adapter-operaton.version}</version>
   </dependency>
   <dependency>
-    <groupId>org.camunda.bpm.springboot</groupId>
-    <artifactId>camunda-bpm-spring-boot-starter</artifactId>
-    <version>7.24.0</version>
+    <groupId>org.operaton.bpm.springboot</groupId>
+    <artifactId>operaton-bpm-spring-boot-starter</artifactId>
+    <version>2.1.3</version>
   </dependency>
 </dependencies>
 ```
@@ -172,7 +165,7 @@ Correlation API implementation support the following restrictions:
 
 ## Task Information
 
-Currently, the Process Engine Adapter C7 Embedded supports the following values in task information meta block, mapped from the Camunda C7 engine:
+Currently, the Process Engine Adapter Operaton Embedded supports the following values in task information meta block, mapped from the Operaton engine:
 
 The `TaskInformation.getMeta()` provides meta information about the task in form of a `Map<String, String>` for maximum compatibility. The Original Type column denotes
 the real type, you want to access if reading the field. For this purpose, `TaskInformation` offers special access methods `getMetaValueAsOffsetDate` and `getMetaValueAsStringSet`.
@@ -210,7 +203,7 @@ the real type, you want to access if reading the field. For this purpose, `TaskI
 ## Engine Command Executor
 
 `EngineCommandExecutor` is an embedded-adapter-specific class that controls how the four core API calls
-(`correlateMessage`, `sendSignal`, `startProcess`, `deploy`) are dispatched to the embedded Camunda 7 engine.
+(`correlateMessage`, `sendSignal`, `startProcess`, `deploy`) are dispatched to the embedded Operaton engine.
 
 By default, all engine calls are submitted asynchronously to `ForkJoinPool.commonPool()`. This means they run on a
 **different thread** from the caller and do **not** participate in the caller's `@Transactional` context — a rollback

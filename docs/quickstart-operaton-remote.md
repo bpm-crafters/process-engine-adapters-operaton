@@ -1,11 +1,13 @@
 ---
-title: Camunda Platform 7 as remote engine
+title: Operaton as remote engine
 ---
 
-If you start with a Camunda Platform 7, operated remotely, the following configuration is applicable for you.
+If you start with Operaton, operated remotely, the following configuration is applicable for you.
 
-First of all add the corresponding adapter to your project's classpath. In order to connect to remote engine,
-you need a Camunda 7 REST client on the classpath. The current examples use the Holunda Feign starter. Add the official Camunda external task client only if you want subscribed service-task delivery (`remote_subscribed`):
+First of all add the corresponding adapter to your project's classpath. In order to connect to the remote engine,
+you need a REST client for Operaton's Camunda-7-compatible REST API on the classpath. The current examples use the
+Holunda Feign starter. Add the official Operaton external task client only if you want subscribed service-task
+delivery (`remote_subscribed`):
 
 ```xml
 <dependencies>
@@ -13,32 +15,33 @@ you need a Camunda 7 REST client on the classpath. The current examples use the 
   <dependency>
     <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
     <artifactId>process-engine-adapter-operaton-remote-spring-boot-starter</artifactId>
-    <version>${process-engine-api.version}</version>
+    <version>${process-engine-adapter-operaton.version}</version>
   </dependency>
-  <!-- rest client library -->
+  <!-- rest client library (Spring Boot 4 variant) -->
   <dependency>
     <groupId>io.holunda.c7</groupId>
-    <artifactId>c7-rest-client-spring-boot-starter-feign</artifactId>
-    <version>${c7.version}</version>
+    <artifactId>c7-rest-client-spring-boot-starter-feign-4</artifactId>
+    <version>${c7-rest-client.version}</version>
   </dependency>
   <!-- Optional, only for service-tasks.delivery-strategy=remote_subscribed -->
   <dependency>
-    <groupId>org.camunda.bpm.springboot</groupId>
-    <artifactId>camunda-bpm-spring-boot-starter-external-task-client</artifactId>
-    <version>7.24.0</version>
+    <groupId>org.operaton.bpm.springboot</groupId>
+    <artifactId>operaton-bpm-spring-boot-starter-external-task-client</artifactId>
+    <version>2.1.3</version>
   </dependency>
 </dependencies>
 ```
 
-If you build on Spring Boot 4, use `io.holunda.c7:c7-rest-client-spring-boot-starter-feign-4` instead of `...-feign`.
+The community REST client is built for Camunda 7; it works against Operaton because Operaton exposes a
+Camunda-7-compatible REST API under `/engine-rest`.
 
 ## Jackson and Spin combinations
 
 For the remote adapter, Jackson 3 is the straightforward Spring Boot 4 path.
 
-- The remote adapter does not depend on embedded Camunda Spin.
+- The remote adapter does not depend on embedded Spin.
 - Jackson 3 can therefore be used without the embedded Spin limitation.
-- The main Spin restriction applies to embedded Camunda 7 JSON variable serialization, not to the remote adapter itself.
+- The main Spin restriction applies to embedded JSON variable serialization, not to the remote adapter itself.
 
 If you need Spin-based JSON variable serialization, that restriction remains on the remote engine side. The adapter's
 own serialization can still follow the Spring Boot ecosystem used by the remote application.
@@ -76,7 +79,7 @@ feign:
         url: "http://localhost:9090/engine-rest/"
 
 # Only needed for service-tasks.delivery-strategy=remote_subscribed
-camunda:
+operaton:
   bpm:
     client:
       base-url: "http://localhost:9090/engine-rest/"

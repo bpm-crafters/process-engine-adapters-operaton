@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture
 private val logger = KotlinLogging.logger {}
 
 /**
- * Implementation using Camunda taskService Java API for completion of user tasks.
+ * Implementation using Operaton taskService Java API for completion of user tasks.
  * @since 0.0.1
  */
 class OperatonUserTaskCompletionApiImpl(
