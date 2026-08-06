@@ -53,7 +53,7 @@ so the adapter matches Spin instead of relying on the default selection.
 
 ## Configuration
 
-All embedded adapter properties use the prefix `dev.bpm-crafters.process-api.adapter.c7embedded`.
+All embedded adapter properties use the prefix `dev.bpm-crafters.process-api.adapter.operaton-embedded`.
 
 The adapter starter does not bring an embedded Camunda engine on its own. Add it together with a Camunda 7 embedded setup such as `camunda-bpm-spring-boot-starter` or `camunda-bpm-spring-boot-starter-webapp`.
 
@@ -63,7 +63,7 @@ The adapter starter does not bring an embedded Camunda engine on its own. Add it
 <dependencies>
   <dependency>
     <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
-    <artifactId>process-engine-adapter-camunda-platform-c7-embedded-spring-boot-starter</artifactId>
+    <artifactId>process-engine-adapter-operaton-embedded-spring-boot-starter</artifactId>
     <version>${process-engine-api.version}</version>
   </dependency>
   <dependency>
@@ -81,7 +81,7 @@ dev:
   bpm-crafters:
     process-api:
       adapter:
-        c7embedded:
+        operaton-embedded:
           enabled: true
           service-tasks:
             delivery-strategy: embedded_scheduled
@@ -142,7 +142,7 @@ dev:
   bpm-crafters:
     process-api:
       adapter:
-        c7embedded:
+        operaton-embedded:
           enabled: true
           service-tasks:
             delivery-strategy: embedded_scheduled

@@ -11,7 +11,7 @@ First of all, add the corresponding adapter and an embedded Camunda 7 starter to
 <dependencies>
   <dependency>
     <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
-    <artifactId>process-engine-adapter-camunda-platform-c7-embedded-spring-boot-starter</artifactId>
+    <artifactId>process-engine-adapter-operaton-embedded-spring-boot-starter</artifactId>
     <version>${process-engine-api.version}</version>
   </dependency>
   <dependency>
@@ -73,7 +73,7 @@ dev:
   bpm-crafters:
     process-api:
       adapter:
-        c7embedded:
+        operaton-embedded:
           enabled: true
           service-tasks:
             delivery-strategy: embedded_scheduled

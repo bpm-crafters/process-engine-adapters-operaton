@@ -2,7 +2,7 @@
 
 ## 1. Overview
 
-This repository contains the Camunda 7 implementation of the BPM Crafters Process Engine Adapter API. It is organized as a Maven multi-module workspace with library modules, Spring Boot starters, shared test support, and runnable examples.
+This repository contains the Operaton implementation of the BPM Crafters Process Engine Adapter API. It is organized as a Maven multi-module workspace with library modules, Spring Boot starters, shared test support, and runnable examples.
 
 ## 2. Folder Structure
 
@@ -12,11 +12,11 @@ This repository contains the Camunda 7 implementation of the BPM Crafters Proces
 - `docs`: user-facing adapter documentation, including quickstarts and embedded/remote reference guides.
 - `engine-adapter`: main library modules.
   - `adapter-testing`: shared Kotlin test support and JGiven-based integration test utilities.
-  - `c7-adapter-common`: shared functionality used by both implementations.
-  - `c7-embedded-core`: embedded Camunda 7 adapter implementation, grouped by concerns such as process, task, decision, deploy, correlation, and shared engine helpers.
-  - `c7-embedded-spring-boot-starter`: Spring Boot auto-configuration and scheduling/bootstrap wiring for the embedded adapter.
-  - `c7-remote-core`: remote Camunda 7 adapter implementation, mirroring the embedded core structure where possible.
-  - `c7-remote-spring-boot-starter`: Spring Boot auto-configuration, client wiring, and polling/subscription setup for the remote adapter.
+  - `operaton-adapter-common`: shared functionality used by both implementations.
+  - `operaton-embedded-core`: embedded Operaton adapter implementation, grouped by concerns such as process, task, decision, deploy, correlation, and shared engine helpers.
+  - `operaton-embedded-spring-boot-starter`: Spring Boot auto-configuration and scheduling/bootstrap wiring for the embedded adapter.
+  - `operaton-remote-core`: remote Operaton adapter implementation, mirroring the embedded core structure where possible.
+  - `operaton-remote-spring-boot-starter`: Spring Boot auto-configuration, client wiring, and polling/subscription setup for the remote adapter.
 - `examples`: runnable sample applications and shared example code.
   - `java-common-fixture`: shared Java example domain, ports, adapters, controllers, and task handlers.
   - `java-c7-embedded`: embedded example application and tests.

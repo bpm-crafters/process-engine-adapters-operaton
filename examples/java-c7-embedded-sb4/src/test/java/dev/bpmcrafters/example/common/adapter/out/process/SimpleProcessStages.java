@@ -6,7 +6,7 @@ import com.tngtech.jgiven.annotation.Quoted;
 import dev.bpmcrafters.example.common.adapter.shared.SimpleProcessWorkflowConst.Elements;
 import dev.bpmcrafters.example.common.application.port.out.UserTaskOutPort;
 import dev.bpmcrafters.example.common.application.port.out.WorkflowOutPort;
-import dev.bpmcrafters.processengineapi.adapter.c7.embedded.testing.AbstractC7EmbeddedStage;
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.testing.AbstractOperatonEmbeddedStage;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
@@ -33,7 +33,7 @@ public class SimpleProcessStages {
    * Drives the process through the public workflow and user-task ports while the base embedded stage
    * provides Camunda-level assertions.
    */
-  static class ActionStage extends AbstractC7EmbeddedStage<ActionStage> {
+  static class ActionStage extends AbstractOperatonEmbeddedStage<ActionStage> {
 
     @ProvidedScenarioState
     private WorkflowOutPort workflowOutPort;
@@ -134,7 +134,7 @@ public class SimpleProcessStages {
    * Uses the assertion helpers inherited from the embedded test support; the separate type keeps the
    * given/when and then parts of the JGiven scenario readable.
    */
-  static class AssertStage extends AbstractC7EmbeddedStage<AssertStage> {
+  static class AssertStage extends AbstractOperatonEmbeddedStage<AssertStage> {
 
   }
 }

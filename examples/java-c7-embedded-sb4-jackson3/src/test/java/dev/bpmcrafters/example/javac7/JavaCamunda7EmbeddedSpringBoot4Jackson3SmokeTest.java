@@ -18,8 +18,8 @@ import static org.awaitility.Awaitility.await;
   classes = JavaCamunda7ExampleApplication.class,
   webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
   properties = {
-    "dev.bpm-crafters.process-api.adapter.c7embedded.service-tasks.schedule-delivery-fixed-rate-in-seconds=1",
-    "dev.bpm-crafters.process-api.adapter.c7embedded.user-tasks.schedule-delivery-fixed-rate-in-seconds=1"
+    "dev.bpm-crafters.process-api.adapter.operaton-embedded.service-tasks.schedule-delivery-fixed-rate-in-seconds=1",
+    "dev.bpm-crafters.process-api.adapter.operaton-embedded.user-tasks.schedule-delivery-fixed-rate-in-seconds=1"
   }
 )
 class JavaCamunda7EmbeddedSpringBoot4Jackson3SmokeTest {

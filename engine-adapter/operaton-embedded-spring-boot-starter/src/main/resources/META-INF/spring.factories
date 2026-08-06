@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.AutoConfigurationImportFilter=\
+dev.bpmcrafters.processengineapi.adapter.operaton.embedded.springboot.CamundaBpmSpringBoot4AutoConfigurationImportFilter

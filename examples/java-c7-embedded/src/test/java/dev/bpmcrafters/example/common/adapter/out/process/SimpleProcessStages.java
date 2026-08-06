@@ -7,13 +7,13 @@ import dev.bpmcrafters.example.common.adapter.shared.SimpleProcessWorkflowConst.
 import dev.bpmcrafters.example.common.adapter.shared.SimpleProcessWorkflowConst.Expressions;
 import dev.bpmcrafters.example.common.application.port.out.UserTaskOutPort;
 import dev.bpmcrafters.example.common.application.port.out.WorkflowOutPort;
-import dev.bpmcrafters.processengineapi.adapter.c7.embedded.testing.AbstractC7EmbeddedStage;
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.testing.AbstractOperatonEmbeddedStage;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.bpm.engine.variable.Variables;
 
 public class SimpleProcessStages {
 
-  static class ActionStage extends AbstractC7EmbeddedStage<ActionStage> {
+  static class ActionStage extends AbstractOperatonEmbeddedStage<ActionStage> {
 
     @ProvidedScenarioState
     private WorkflowOutPort workflowOutPort;
@@ -110,7 +110,7 @@ public class SimpleProcessStages {
     }
   }
 
-  static class AssertStage extends AbstractC7EmbeddedStage<AssertStage> {
+  static class AssertStage extends AbstractOperatonEmbeddedStage<AssertStage> {
 
   }
 }

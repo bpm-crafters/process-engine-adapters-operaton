@@ -13,7 +13,7 @@ dev:
   bpm-crafters:
     process-api:
       adapter:
-        c7embedded:
+        operaton-embedded:
           enabled: true
           service-tasks:
             delivery-strategy: embedded_scheduled
@@ -44,4 +44,4 @@ camunda:
 logging:
   level:
     dev.bpmcrafters.processengineapi: INFO
-    dev.bpmcrafters.processengineapi.adapter.c7.embedded.springboot: INFO
+    dev.bpmcrafters.processengineapi.adapter.operaton.embedded.springboot: INFO

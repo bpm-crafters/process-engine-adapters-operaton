@@ -3,7 +3,7 @@
 
 [![stable](https://img.shields.io/badge/lifecycle-STABLE-green.svg)](https://github.com/holisticon#open-source-lifecycle)
 [![Development branches](https://github.com/bpm-crafters/process-engine-adapters-camunda-7/actions/workflows/development.yml/badge.svg)](https://github.com/bpm-crafters/process-engine-adapters-camunda-7/actions/workflows/development.yml)
-[![Maven Central Version](https://img.shields.io/maven-central/v/dev.bpm-crafters.process-engine-adapters/process-engine-adapter-camunda-platform-c7-bom)](https://maven-badges.herokuapp.com/maven-central/dev.bpm-crafters.process-engine-adapters/process-engine-adapter-camunda-platform-c7-bom)
+[![Maven Central Version](https://img.shields.io/maven-central/v/dev.bpm-crafters.process-engine-adapters/process-engine-adapter-operaton-bom)](https://maven-badges.herokuapp.com/maven-central/dev.bpm-crafters.process-engine-adapters/process-engine-adapter-operaton-bom)
 [![Camunda Platform 7](https://img.shields.io/badge/Compatible%20with-Camunda%20Platform%207-26d07c)](https://img.shields.io/badge/Compatible%20with-Camunda%20Platform%207-26d07c)
 
 ## Purpose of the library
@@ -36,7 +36,7 @@ If you want to start usage, please add the BOM to your Maven project and add the
 ```xml
 <dependency>
   <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
-  <artifactId>process-engine-adapter-camunda-platform-c7-bom</artifactId>
+  <artifactId>process-engine-adapter-operaton-bom</artifactId>
   <version>${process-engine-adapter-camunda-7.version}</version>
   <scope>import</scope>
   <type>pom</type>
@@ -46,8 +46,8 @@ If you want to start usage, please add the BOM to your Maven project and add the
 
 The library contains of the following Maven modules:
 
-- `process-engine-adapter-camunda-platform-c7-embedded-core`: Camunda 7 Platform Embedded Adapter implementation 
-- `process-engine-adapter-camunda-platform-c7-embedded-spring-boot-starter`: Camunda 7 Platform Embedded Adapter Spring Boot Starter 
-- `process-engine-adapter-camunda-platform-c7-remote-core`: Camunda 7 Platform Remote Adapter implementation 
-- `process-engine-adapter-camunda-platform-c7-remote-spring-boot-starter`: Camunda 7 Platform Remote Adapter Spring Boot Starter 
-- `process-engine-adapter-camunda-platform-c7-bom`: Maven BOM containing dependency definitions.
+- `process-engine-adapter-operaton-embedded-core`: Camunda 7 Platform Embedded Adapter implementation 
+- `process-engine-adapter-operaton-embedded-spring-boot-starter`: Camunda 7 Platform Embedded Adapter Spring Boot Starter 
+- `process-engine-adapter-operaton-remote-core`: Camunda 7 Platform Remote Adapter implementation 
+- `process-engine-adapter-operaton-remote-spring-boot-starter`: Camunda 7 Platform Remote Adapter Spring Boot Starter 
+- `process-engine-adapter-operaton-bom`: Maven BOM containing dependency definitions.

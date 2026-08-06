@@ -12,7 +12,7 @@ you need a Camunda 7 REST client on the classpath. The current examples use the 
   <!-- the correct adapter -->
   <dependency>
     <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
-    <artifactId>process-engine-adapter-camunda-platform-c7-remote-spring-boot-starter</artifactId>
+    <artifactId>process-engine-adapter-operaton-remote-spring-boot-starter</artifactId>
     <version>${process-engine-api.version}</version>
   </dependency>
   <!-- rest client library -->
@@ -50,7 +50,7 @@ dev:
   bpm-crafters:
     process-api:
       adapter:
-        c7remote:
+        operaton-remote:
           enabled: true
           service-tasks:
             delivery-strategy: remote_scheduled # or remote_subscribed with the official external task client

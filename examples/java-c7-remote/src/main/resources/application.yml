@@ -19,7 +19,7 @@ dev:
   bpm-crafters:
     process-api:
       adapter:
-        c7remote:
+        operaton-remote:
           enabled: true
           service-tasks:
             delivery-strategy: remote_scheduled
@@ -51,4 +51,4 @@ feign:
 logging:
   level:
     dev.bpmcrafters.processengineapi: INFO
-    dev.bpmcrafters.processengineapi.adapter.c7.remote.springboot: INFO
+    dev.bpmcrafters.processengineapi.adapter.operaton.remote.springboot: INFO

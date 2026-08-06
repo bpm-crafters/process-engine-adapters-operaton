@@ -1,8 +1,8 @@
 package dev.bpmcrafters.example.javac7;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.bpmcrafters.processengineapi.adapter.c7.common.serialization.AdapterDataConverter;
-import dev.bpmcrafters.processengineapi.adapter.c7.common.serialization.Jackson2AdapterDataConverter;
+import dev.bpmcrafters.processengineapi.adapter.operaton.common.serialization.AdapterDataConverter;
+import dev.bpmcrafters.processengineapi.adapter.operaton.common.serialization.Jackson2AdapterDataConverter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;

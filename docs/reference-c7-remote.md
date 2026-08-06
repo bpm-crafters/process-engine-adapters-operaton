@@ -6,7 +6,7 @@ title: Process Engine Adapter C7 Remote
 
 ## Configuration
 
-All remote adapter properties use the prefix `dev.bpm-crafters.process-api.adapter.c7remote`.
+All remote adapter properties use the prefix `dev.bpm-crafters.process-api.adapter.operaton-remote`.
 
 The remote starter expects a Camunda 7 REST client library on the classpath. The official Camunda external task client is optional and only needed when service tasks use subscribed delivery.
 
@@ -14,7 +14,7 @@ The remote starter expects a Camunda 7 REST client library on the classpath. The
 
 | Use case | Required dependencies |
 |----------|-----------------------|
-| Remote adapter in general | `process-engine-adapter-camunda-platform-c7-remote-spring-boot-starter` plus a Feign-based Camunda 7 REST client starter |
+| Remote adapter in general | `process-engine-adapter-operaton-remote-spring-boot-starter` plus a Feign-based Camunda 7 REST client starter |
 | Service tasks with `remote_scheduled` | Same as above |
 | Service tasks with `remote_subscribed` | Same as above, plus `org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-external-task-client:7.24.0` |
 
@@ -70,7 +70,7 @@ dev:
   bpm-crafters:
     process-api:
       adapter:
-        c7remote:
+        operaton-remote:
           enabled: true
           service-tasks:
             delivery-strategy: remote_scheduled
@@ -92,7 +92,7 @@ dev:
   bpm-crafters:
     process-api:
       adapter:
-        c7remote:
+        operaton-remote:
           enabled: true
           service-tasks:
             delivery-strategy: remote_subscribed
@@ -169,7 +169,7 @@ dev:
   bpm-crafters:
     process-api:
       adapter:
-        c7remote:
+        operaton-remote:
           enabled: true
           service-tasks:
             delivery-strategy: remote_scheduled
