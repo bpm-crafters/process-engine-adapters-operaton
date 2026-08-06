@@ -3,18 +3,18 @@ package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.process
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.process.AbstractOperatonEmbeddedApiITest.Companion.BPMN
 import io.toolisticon.testing.jgiven.THEN
 import io.toolisticon.testing.jgiven.WHEN
-import org.camunda.bpm.engine.test.Deployment
-import org.camunda.bpm.engine.test.junit5.ProcessEngineExtension
+import org.operaton.bpm.engine.test.Deployment
+import org.operaton.bpm.engine.test.junit5.ProcessEngineExtension
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
 
 @Deployment(resources = [BPMN])
-class OperatonEmbeddedStartProcessApiITest : AbstractOperatonEmbeddedApiITest(OperatonEmbeddedProcessTestHelper(camunda.processEngine)) {
+class OperatonEmbeddedStartProcessApiITest : AbstractOperatonEmbeddedApiITest(OperatonEmbeddedProcessTestHelper(operaton.processEngine)) {
 
   companion object {
     @RegisterExtension
-    val camunda: ProcessEngineExtension = ProcessEngineExtension.builder().useProcessEngine(processEngine).build()
+    val operaton: ProcessEngineExtension = ProcessEngineExtension.builder().useProcessEngine(processEngine).build()
   }
 
   @Test

@@ -3,7 +3,7 @@ package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.completi
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineCommandExecutor
 import dev.bpmcrafters.processengineapi.task.FailTaskCmd
 import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
-import org.camunda.bpm.engine.ExternalTaskService
+import org.operaton.bpm.engine.ExternalTaskService
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -22,7 +22,7 @@ internal class OperatonServiceTaskCompletionApiImplTest {
   )
 
   @Test
-  fun `failTask passes provided retryBackoff in milliseconds to camunda engine`() {
+  fun `failTask passes provided retryBackoff in milliseconds to operaton engine`() {
     completionApi.failTask(
       FailTaskCmd("task", "reason", "details", 2, Duration.ofSeconds(3))
     ).join()

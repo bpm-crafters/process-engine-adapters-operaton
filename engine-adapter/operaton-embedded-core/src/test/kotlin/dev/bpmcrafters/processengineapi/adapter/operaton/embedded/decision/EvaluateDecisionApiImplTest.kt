@@ -6,11 +6,11 @@ import dev.bpmcrafters.processengineapi.adapter.operaton.common.serialization.Ja
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineCommandExecutor
 import dev.bpmcrafters.processengineapi.decision.DecisionByRefEvaluationCommand
 import org.assertj.core.api.Assertions.assertThat
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultEntriesImpl
-import org.camunda.bpm.dmn.engine.impl.DmnDecisionResultImpl
-import org.camunda.bpm.engine.DecisionService
-import org.camunda.bpm.engine.dmn.DecisionsEvaluationBuilder
-import org.camunda.bpm.engine.variable.Variables
+import org.operaton.bpm.dmn.engine.impl.DmnDecisionResultEntriesImpl
+import org.operaton.bpm.dmn.engine.impl.DmnDecisionResultImpl
+import org.operaton.bpm.engine.DecisionService
+import org.operaton.bpm.engine.dmn.DecisionsEvaluationBuilder
+import org.operaton.bpm.engine.variable.Variables
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Answers

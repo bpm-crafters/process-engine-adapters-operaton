@@ -2,18 +2,18 @@ package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.process
 
 import dev.bpmcrafters.processengineapi.CommonRestrictions
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineCommandExecutor
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.testing.mockProcessDefinitionQuery
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.testing.processDefinitionFake
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.testing.processInstanceFake
 import dev.bpmcrafters.processengineapi.process.StartProcessByDefinitionAtElementCmd
 import dev.bpmcrafters.processengineapi.process.StartProcessByDefinitionCmd
 import dev.bpmcrafters.processengineapi.process.StartProcessByMessageAtElementCmd
 import dev.bpmcrafters.processengineapi.process.StartProcessByMessageCmd
-import org.camunda.bpm.engine.RepositoryService
-import org.camunda.bpm.engine.RuntimeService
-import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder
-import org.camunda.bpm.engine.runtime.ModificationBuilder
-import org.camunda.bpm.engine.runtime.ProcessInstance
-import org.camunda.community.mockito.QueryMocks
-import org.camunda.community.mockito.process.ProcessDefinitionFake
-import org.camunda.community.mockito.process.ProcessInstanceFake
+import org.operaton.bpm.engine.RepositoryService
+import org.operaton.bpm.engine.RuntimeService
+import org.operaton.bpm.engine.runtime.MessageCorrelationBuilder
+import org.operaton.bpm.engine.runtime.ModificationBuilder
+import org.operaton.bpm.engine.runtime.ProcessInstance
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -47,7 +47,7 @@ class StartProcessApiImplTest {
   fun `should start process via definition without payload`() {
     // given
     val startProcessByDefinitionCmd = StartProcessByDefinitionCmd("definitionKey", { emptyMap() })
-    val processInstance: ProcessInstance = ProcessInstanceFake.builder().id("someId").build()
+    val processInstance: ProcessInstance = processInstanceFake(id = "someId")
     whenever(runtimeService.startProcessInstanceByKey(anyString(), anyOrNull(), anyMap())).thenReturn(processInstance)
 
     // when
@@ -65,23 +65,15 @@ class StartProcessApiImplTest {
       { emptyMap() },
       mapOf(CommonRestrictions.TENANT_ID to "tenantId")
     )
+    val processInstance = processInstanceFake(id = "someId")
     whenever(runtimeService.startProcessInstanceById(
       anyString(),
       anyOrNull(),
       anyMap(),
-    )).thenReturn(
-      ProcessInstanceFake
-        .builder()
-        .id("someId")
-        .build()
-    )
-    QueryMocks.mockProcessDefinitionQuery(repositoryService).singleResult(
-      ProcessDefinitionFake
-        .builder()
-        .id("definitionId")
-        .tenantId("tenantId")
-        .build()
-    )
+    )).thenReturn(processInstance)
+    val processDefinition = processDefinitionFake(id = "definitionId", tenantId = "tenantId")
+    val processDefinitionQuery = mockProcessDefinitionQuery(repositoryService)
+    whenever(processDefinitionQuery.singleResult()).thenReturn(processDefinition)
 
     // when
     startProcessApi.startProcess(startProcessByDefinitionCmd).get()
@@ -93,7 +85,7 @@ class StartProcessApiImplTest {
   @Test
   fun `should start process via definition with payload and business key`() {
     // given
-    val processInstance: ProcessInstance = ProcessInstanceFake.builder().id("someId").build()
+    val processInstance: ProcessInstance = processInstanceFake(id = "someId")
     whenever(runtimeService.startProcessInstanceByKey(anyString(), anyOrNull(), anyMap())).thenReturn(processInstance)
     val startProcessByDefinitionCmd = StartProcessByDefinitionCmd("definitionKey", {
       mapOf(
@@ -209,16 +201,14 @@ class StartProcessApiImplTest {
   }
 
   private fun processInstanceMock(processDefinitionId: String): ProcessInstance =
-    ProcessInstanceFake.builder()
-      .id("instance-123")
-      .processDefinitionId(processDefinitionId)
-      .build()
+    processInstanceFake(id = "instance-123", processDefinitionId = processDefinitionId)
 
   private fun messageCorrelationMock(): MessageCorrelationBuilder {
+    val startedInstance = processInstanceFake(id = "someId")
     val builder: MessageCorrelationBuilder = mock()
     lenient().whenever(builder.processInstanceBusinessKey(any())).thenReturn(builder)
     whenever(builder.setVariables(anyMap())).thenReturn(builder)
-    whenever(builder.correlateStartMessage()).thenReturn(ProcessInstanceFake.builder().id("someId").build())
+    whenever(builder.correlateStartMessage()).thenReturn(startedInstance)
 
     return builder
   }

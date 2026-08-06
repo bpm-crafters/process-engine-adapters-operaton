@@ -4,8 +4,8 @@ import dev.bpmcrafters.processengineapi.CommonRestrictions
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.task.delivery.toDateString
 import dev.bpmcrafters.processengineapi.task.TaskInformation
 import org.assertj.core.api.Assertions.assertThat
-import org.camunda.bpm.client.task.ExternalTask
-import org.camunda.bpm.client.task.impl.ExternalTaskImpl
+import org.operaton.bpm.client.task.ExternalTask
+import org.operaton.bpm.client.task.impl.ExternalTaskImpl
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.*

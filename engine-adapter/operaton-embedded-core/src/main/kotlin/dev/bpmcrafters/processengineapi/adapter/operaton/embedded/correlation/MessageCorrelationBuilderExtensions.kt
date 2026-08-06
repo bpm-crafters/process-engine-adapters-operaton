@@ -1,7 +1,7 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.correlation
 
 import dev.bpmcrafters.processengineapi.CommonRestrictions
-import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder
+import org.operaton.bpm.engine.runtime.MessageCorrelationBuilder
 
 /**
  * Checks that the restrictions on tenant usage are not misconfigured.

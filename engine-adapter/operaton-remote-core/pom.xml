@@ -31,15 +31,25 @@
 
     <!-- Use subscription-based delivery using official client -->
     <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-external-task-client</artifactId>
-      <version>7.24.0</version>
+      <groupId>org.operaton.bpm</groupId>
+      <artifactId>operaton-external-task-client</artifactId>
+      <version>${operaton.version}</version>
       <optional>true</optional>
     </dependency>
 
+    <!-- Only used by the community REST client's Spin serializer in TestFixtures -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-plugin-spin</artifactId>
+      <version>7.24.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Typed values API exchanged with the community client's ValueMapper; previously arrived
+         transitively via the spin plugin, which is test-scoped now -->
+    <dependency>
+      <groupId>org.camunda.commons</groupId>
+      <artifactId>camunda-commons-typed-values</artifactId>
       <version>7.24.0</version>
       <scope>provided</scope>
     </dependency>
@@ -47,13 +57,13 @@
     <dependency>
       <groupId>io.holunda.c7</groupId>
       <artifactId>c7-rest-client-spring-boot-openapi</artifactId>
-      <version>${c7.version}</version>
+      <version>${c7-rest-client.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>io.holunda.c7</groupId>
       <artifactId>c7-rest-client-variables</artifactId>
-      <version>${c7.version}</version>
+      <version>${c7-rest-client.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

@@ -12,16 +12,12 @@
   <artifactId>process-engine-adapter-operaton-embedded-core</artifactId>
   <name>Adapter: Operaton Embedded Core</name>
 
-  <properties>
-    <camunda.version>7.24.0</camunda.version>
-  </properties>
-
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-bom</artifactId>
-        <version>${camunda.version}</version>
+        <groupId>org.operaton.bpm</groupId>
+        <artifactId>operaton-only-bom</artifactId>
+        <version>${operaton.version}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -29,6 +25,13 @@
   </dependencyManagement>
 
   <dependencies>
+    <!-- Must precede operaton-engine on the test classpath: feel-engine's scala-shaded jar bundles an
+         outdated, unrelocated copy of paranamer that would otherwise shadow the version JGiven needs -->
+    <dependency>
+      <groupId>com.thoughtworks.paranamer</groupId>
+      <artifactId>paranamer</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
       <artifactId>process-engine-adapter-operaton-adapter-common</artifactId>
@@ -45,8 +48,8 @@
       <version>${process-engine-api.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
+      <groupId>org.operaton.bpm</groupId>
+      <artifactId>operaton-engine</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -64,9 +67,8 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-bpm-assert</artifactId>
-      <version>${camunda.version}</version>
+      <groupId>org.operaton.bpm</groupId>
+      <artifactId>operaton-bpm-assert</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -83,15 +85,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-bpm-junit5</artifactId>
-      <version>${camunda.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.holunda.c7</groupId>
-      <artifactId>c7-mockito</artifactId>
-      <version>2026.04.2</version>
+      <groupId>org.operaton.bpm</groupId>
+      <artifactId>operaton-bpm-junit5</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

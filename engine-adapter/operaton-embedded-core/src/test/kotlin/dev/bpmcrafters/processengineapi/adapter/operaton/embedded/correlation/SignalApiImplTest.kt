@@ -4,8 +4,8 @@ import dev.bpmcrafters.processengineapi.Empty
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineCommandExecutor
 import dev.bpmcrafters.processengineapi.correlation.SendSignalCmd
 import org.assertj.core.api.Assertions.assertThat
-import org.camunda.bpm.engine.RuntimeService
-import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder
+import org.operaton.bpm.engine.RuntimeService
+import org.operaton.bpm.engine.runtime.SignalEventReceivedBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith

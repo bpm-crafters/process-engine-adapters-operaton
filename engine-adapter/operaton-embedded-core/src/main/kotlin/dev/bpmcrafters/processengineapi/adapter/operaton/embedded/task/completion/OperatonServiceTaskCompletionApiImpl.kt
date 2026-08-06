@@ -5,7 +5,7 @@ import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineC
 import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
 import dev.bpmcrafters.processengineapi.task.*
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.camunda.bpm.engine.ExternalTaskService
+import org.operaton.bpm.engine.ExternalTaskService
 import java.util.concurrent.CompletableFuture
 
 private val logger = KotlinLogging.logger {}

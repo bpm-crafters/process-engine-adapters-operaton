@@ -5,11 +5,11 @@ import dev.bpmcrafters.processengineapi.task.TaskInformation
 import dev.bpmcrafters.processengineapi.impl.task.TaskSubscriptionHandle
 import dev.bpmcrafters.processengineapi.task.TaskType
 import org.assertj.core.api.Assertions.assertThat
-import org.camunda.bpm.client.ExternalTaskClient
-import org.camunda.bpm.client.task.ExternalTaskHandler
-import org.camunda.bpm.client.task.ExternalTask
-import org.camunda.bpm.client.task.ExternalTaskService
-import org.camunda.bpm.client.topic.TopicSubscriptionBuilder
+import org.operaton.bpm.client.ExternalTaskClient
+import org.operaton.bpm.client.task.ExternalTaskHandler
+import org.operaton.bpm.client.task.ExternalTask
+import org.operaton.bpm.client.task.ExternalTaskService
+import org.operaton.bpm.client.topic.TopicSubscriptionBuilder
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock

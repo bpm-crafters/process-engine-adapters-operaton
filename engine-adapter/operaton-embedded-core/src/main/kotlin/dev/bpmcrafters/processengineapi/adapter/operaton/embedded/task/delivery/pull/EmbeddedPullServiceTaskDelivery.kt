@@ -14,9 +14,9 @@ import dev.bpmcrafters.processengineapi.task.TaskInformation
 import dev.bpmcrafters.processengineapi.task.TaskInformation.Companion.CREATE
 import dev.bpmcrafters.processengineapi.task.TaskType
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.camunda.bpm.engine.ExternalTaskService
-import org.camunda.bpm.engine.externaltask.ExternalTaskQueryBuilder
-import org.camunda.bpm.engine.externaltask.LockedExternalTask
+import org.operaton.bpm.engine.ExternalTaskService
+import org.operaton.bpm.engine.externaltask.ExternalTaskQueryBuilder
+import org.operaton.bpm.engine.externaltask.LockedExternalTask
 import java.time.Duration
 import java.time.OffsetDateTime
 import java.util.concurrent.Callable

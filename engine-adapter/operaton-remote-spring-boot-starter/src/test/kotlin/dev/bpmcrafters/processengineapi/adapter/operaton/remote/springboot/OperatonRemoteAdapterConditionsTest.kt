@@ -41,7 +41,7 @@ class OperatonRemoteAdapterScheduledStrategyConditionsTest {
 
 @SpringBootTest(
   properties = [
-    "camunda.bpm.client.base-url = http://localhost:8080/engine-rest",
+    "operaton.bpm.client.base-url = http://localhost:8080/engine-rest",
     "dev.bpm-crafters.process-api.adapter.operaton-remote.service-tasks.delivery-strategy = remote_subscribed",
     "dev.bpm-crafters.process-api.adapter.operaton-remote.user-tasks.delivery-strategy = remote_scheduled"
   ]

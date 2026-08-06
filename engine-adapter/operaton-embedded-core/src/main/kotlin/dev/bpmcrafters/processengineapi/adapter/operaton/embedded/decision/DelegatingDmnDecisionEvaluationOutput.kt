@@ -2,7 +2,7 @@ package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.decision
 
 import dev.bpmcrafters.processengineapi.adapter.operaton.common.serialization.AdapterDataConverter
 import dev.bpmcrafters.processengineapi.decision.DecisionEvaluationOutput
-import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries
+import org.operaton.bpm.dmn.engine.DmnDecisionResultEntries
 
 /**
  * Delegating output.

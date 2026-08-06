@@ -1,11 +1,11 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery
 
 import dev.bpmcrafters.processengineapi.CommonRestrictions
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.testing.delegateTaskFake
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.testing.taskFake
 import org.assertj.core.api.Assertions.assertThat
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity
-import org.camunda.bpm.engine.task.IdentityLink
-import org.camunda.community.mockito.delegate.DelegateTaskFake
-import org.camunda.community.mockito.task.TaskFake
+import org.operaton.bpm.engine.impl.persistence.entity.IdentityLinkEntity
+import org.operaton.bpm.engine.task.IdentityLink
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.NullSource
 import org.junit.jupiter.params.provider.ValueSource
@@ -20,21 +20,21 @@ class TaskInformationExtensionsKtTest {
   fun `should map Task`(maybeNullDate: Date?) {
     val now = Date.from(Instant.now())
 
-    val task = TaskFake.builder()
-      .id("taskId")
-      .processDefinitionId("processDefinitionId")
-      .processInstanceId("processInstanceId")
-      .tenantId("tenantId")
-      .taskDefinitionKey("taskDefinitionKey")
-      .name("name")
-      .description("description")
-      .assignee("assignee")
-      .createTime(now)
-      .followUpDate(maybeNullDate)
-      .dueDate(maybeNullDate)
-      .formKey("formKey")
-      .lastUpdated(maybeNullDate)
-      .build()
+    val task = taskFake(
+      id = "taskId",
+      processDefinitionId = "processDefinitionId",
+      processInstanceId = "processInstanceId",
+      tenantId = "tenantId",
+      taskDefinitionKey = "taskDefinitionKey",
+      name = "name",
+      description = "description",
+      assignee = "assignee",
+      createTime = now,
+      followUpDate = maybeNullDate,
+      dueDate = maybeNullDate,
+      formKey = "formKey",
+      lastUpdated = maybeNullDate
+    )
 
     val identityLinks =
       listOf(identityLink(groupId = "group"), identityLink(userId = "user-1"), identityLink(userId = "user-2"))
@@ -70,23 +70,27 @@ class TaskInformationExtensionsKtTest {
   fun `should map DelegateTask`(maybeNullDate: Date?) {
     val now = Date.from(Instant.now())
 
-    var delegateTask = DelegateTaskFake("taskId")
-    delegateTask = delegateTask.withProcessDefinitionId("processDefinitionId")
-    delegateTask = delegateTask.withProcessInstanceId("processInstanceId")
-    delegateTask = delegateTask.withTenantId("tenantId")
-    delegateTask = delegateTask.withTaskDefinitionKey("taskDefinitionKey")
-    delegateTask = delegateTask.withName("name")
-    delegateTask = delegateTask.withDescription("description")
-    delegateTask = delegateTask.withAssignee("assignee")
-    delegateTask = delegateTask.withCreateTime(now)
-    delegateTask = delegateTask.withFollowUpDate(maybeNullDate)
-    delegateTask = delegateTask.withLastUpdated(maybeNullDate)
-    delegateTask.dueDate = maybeNullDate
-    delegateTask.addGroupIdentityLink("group-1", "CANDIDATE")
-    delegateTask.addGroupIdentityLink("group-2", "CANDIDATE")
-    delegateTask.addUserIdentityLink("user-1", "CANDIDATE")
-    delegateTask.addUserIdentityLink("user-2", "CANDIDATE")
-    delegateTask.setVariable(CommonRestrictions.BUSINESS_KEY, "businessKey")
+    val delegateTask = delegateTaskFake(
+      id = "taskId",
+      processDefinitionId = "processDefinitionId",
+      processInstanceId = "processInstanceId",
+      tenantId = "tenantId",
+      taskDefinitionKey = "taskDefinitionKey",
+      name = "name",
+      description = "description",
+      assignee = "assignee",
+      createTime = now,
+      followUpDate = maybeNullDate,
+      dueDate = maybeNullDate,
+      lastUpdated = maybeNullDate,
+      candidates = setOf(
+        identityLink(groupId = "group-1"),
+        identityLink(groupId = "group-2"),
+        identityLink(userId = "user-1"),
+        identityLink(userId = "user-2")
+      ),
+      variables = mapOf(CommonRestrictions.BUSINESS_KEY to "businessKey")
+    )
 
     val taskInformation = delegateTask.toTaskInformation()
 

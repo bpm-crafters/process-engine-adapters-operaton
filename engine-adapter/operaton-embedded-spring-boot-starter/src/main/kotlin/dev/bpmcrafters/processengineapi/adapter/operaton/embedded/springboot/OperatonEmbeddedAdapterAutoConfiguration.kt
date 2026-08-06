@@ -31,7 +31,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import io.toolisticon.spring.condition.ConditionalOnMissingQualifiedBean
 import jakarta.annotation.PostConstruct
-import org.camunda.bpm.engine.*
+import org.operaton.bpm.engine.*
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean

@@ -8,8 +8,8 @@ import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineC
 import dev.bpmcrafters.processengineapi.correlation.SendSignalCmd
 import dev.bpmcrafters.processengineapi.correlation.SignalApi
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.camunda.bpm.engine.RuntimeService
-import org.camunda.bpm.engine.runtime.SignalEventReceivedBuilder
+import org.operaton.bpm.engine.RuntimeService
+import org.operaton.bpm.engine.runtime.SignalEventReceivedBuilder
 import java.util.concurrent.CompletableFuture
 
 private val logger = KotlinLogging.logger {}

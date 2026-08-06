@@ -33,12 +33,12 @@ abstract class AbstractOperatonRemoteApiITestBase : JGivenSpringBaseIntegrationT
 
     @JvmStatic
     @Container
-    val operatonContainer = OperatonRunTestContainer("run-7.24.0")
+    val operatonContainer = OperatonRunTestContainer("2.1.3")
 
     @JvmStatic
     @DynamicPropertySource
     fun configure(registry: DynamicPropertyRegistry) {
-      registry.add("camunda.bpm.client.base-url") { "http://localhost:${operatonContainer.firstMappedPort}/engine-rest/" }
+      registry.add("operaton.bpm.client.base-url") { "http://localhost:${operatonContainer.firstMappedPort}/engine-rest/" }
       registry.add("feign.client.config.default.url") { "http://localhost:${operatonContainer.firstMappedPort}/engine-rest/" }
     }
 

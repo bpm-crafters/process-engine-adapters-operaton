@@ -9,7 +9,7 @@ import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineC
 import dev.bpmcrafters.processengineapi.correlation.CorrelateMessageCmd
 import dev.bpmcrafters.processengineapi.correlation.CorrelationApi
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.camunda.bpm.engine.RuntimeService
+import org.operaton.bpm.engine.RuntimeService
 import java.util.concurrent.CompletableFuture
 
 private val logger = KotlinLogging.logger {}

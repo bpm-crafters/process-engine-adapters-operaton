@@ -10,6 +10,6 @@
   </root>
 
   <logger name="dev.bpmcrafters" level="INFO" />
-  <logger name="org.camunda.bpm.client" level="INFO" />
+  <logger name="org.operaton.bpm.client" level="INFO" />
 
 </configuration>

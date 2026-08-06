@@ -14,11 +14,10 @@
 
   <dependencyManagement>
     <dependencies>
-      <!-- https://mvnrepository.com/artifact/org.camunda.bpm/camunda-bom -->
       <dependency>
-        <groupId>org.camunda.bpm</groupId>
-        <artifactId>camunda-bom</artifactId>
-        <version>7.24.0</version>
+        <groupId>org.operaton.bpm</groupId>
+        <artifactId>operaton-only-bom</artifactId>
+        <version>${operaton.version}</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -26,6 +25,13 @@
   </dependencyManagement>
 
   <dependencies>
+    <!-- Must precede operaton-engine on the test classpath: feel-engine's scala-shaded jar bundles an
+         outdated, unrelocated copy of paranamer that would otherwise shadow the version JGiven needs -->
+    <dependency>
+      <groupId>com.thoughtworks.paranamer</groupId>
+      <artifactId>paranamer</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
       <artifactId>process-engine-adapter-operaton-embedded-core</artifactId>
@@ -45,13 +51,13 @@
       <optional>true</optional>
     </dependency>
     <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
+      <groupId>org.operaton.bpm</groupId>
+      <artifactId>operaton-engine</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.camunda.bpm.springboot</groupId>
-      <artifactId>camunda-bpm-spring-boot-starter</artifactId>
+      <groupId>org.operaton.bpm.springboot</groupId>
+      <artifactId>operaton-bpm-spring-boot-starter</artifactId>
       <scope>provided</scope>
     </dependency>
 
@@ -67,8 +73,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-bpm-junit5</artifactId>
+      <groupId>org.operaton.bpm</groupId>
+      <artifactId>operaton-bpm-junit5</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

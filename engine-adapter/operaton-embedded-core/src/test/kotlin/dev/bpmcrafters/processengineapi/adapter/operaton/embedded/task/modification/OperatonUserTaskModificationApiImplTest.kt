@@ -7,9 +7,9 @@ import dev.bpmcrafters.processengineapi.task.ChangePayloadModifyTaskCmd
 import dev.bpmcrafters.processengineapi.task.TaskModification
 import dev.bpmcrafters.processengineapi.task.UserTaskModificationApi
 import org.assertj.core.api.Assertions.assertThat
-import org.camunda.bpm.engine.TaskService
-import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkEntity
-import org.camunda.bpm.engine.task.Task
+import org.operaton.bpm.engine.TaskService
+import org.operaton.bpm.engine.impl.persistence.entity.IdentityLinkEntity
+import org.operaton.bpm.engine.task.Task
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -254,7 +254,7 @@ internal class OperatonUserTaskModificationApiImplTest {
   }
 
   private fun mockTaskQueryReturning(task: Task) {
-    val taskQuery = mock<org.camunda.bpm.engine.task.TaskQuery>()
+    val taskQuery = mock<org.operaton.bpm.engine.task.TaskQuery>()
     whenever(taskService.createTaskQuery()).thenReturn(taskQuery)
     whenever(taskQuery.taskId(taskId)).thenReturn(taskQuery)
     whenever(taskQuery.singleResult()).thenReturn(task)

@@ -5,24 +5,30 @@ import dev.bpmcrafters.processengineapi.impl.task.TaskSubscriptionHandle
 import dev.bpmcrafters.processengineapi.task.TaskInformation
 import dev.bpmcrafters.processengineapi.task.TaskType
 import org.assertj.core.api.Assertions.assertThat
-import org.camunda.bpm.engine.ExternalTaskService
-import org.camunda.bpm.engine.externaltask.LockedExternalTask
-import org.camunda.bpm.engine.variable.Variables
+import org.operaton.bpm.engine.ExternalTaskService
+import org.operaton.bpm.engine.externaltask.LockedExternalTask
+import org.operaton.bpm.engine.variable.Variables
 import org.junit.jupiter.api.Test
+import org.mockito.Mockito.lenient
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.util.Date
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 internal class EmbeddedPullServiceTaskDeliveryTest {
 
   private val externalTaskService: ExternalTaskService = mock()
+  private val executor = mock<ThreadPoolExecutor>().apply {
+    lenient().doReturn(LinkedBlockingQueue<Runnable>()).whenever(this).queue
+  }
   private val taskDelivery = EmbeddedPullServiceTaskDelivery(
     externalTaskService = externalTaskService,
     subscriptionRepository = mock(),
-    executor = mock(),
+    executor = executor,
     lockDurationInSeconds = 30,
     workerId = "worker",
     maxTasks = 10,
@@ -73,7 +79,7 @@ internal class EmbeddedPullServiceTaskDeliveryTest {
     val delivery = EmbeddedPullServiceTaskDelivery(
       externalTaskService = externalTaskService,
       subscriptionRepository = subscriptionRepository,
-      executor = mock(),
+      executor = executor,
       lockDurationInSeconds = 30,
       workerId = "worker",
       maxTasks = 10,

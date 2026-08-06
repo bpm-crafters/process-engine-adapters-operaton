@@ -9,10 +9,10 @@ import dev.bpmcrafters.processengineapi.impl.task.filterBySubscription
 import dev.bpmcrafters.processengineapi.task.TaskInformation
 import dev.bpmcrafters.processengineapi.task.TaskType
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.camunda.bpm.engine.TaskService
-import org.camunda.bpm.engine.task.IdentityLink
-import org.camunda.bpm.engine.task.Task
-import org.camunda.bpm.engine.task.TaskQuery
+import org.operaton.bpm.engine.TaskService
+import org.operaton.bpm.engine.task.IdentityLink
+import org.operaton.bpm.engine.task.Task
+import org.operaton.bpm.engine.task.TaskQuery
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ExecutorService
 

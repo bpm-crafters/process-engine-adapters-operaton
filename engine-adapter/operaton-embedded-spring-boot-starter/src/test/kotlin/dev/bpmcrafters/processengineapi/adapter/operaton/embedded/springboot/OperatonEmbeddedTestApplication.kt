@@ -11,8 +11,8 @@ import dev.bpmcrafters.processengineapi.task.ServiceTaskCompletionApi
 import dev.bpmcrafters.processengineapi.task.TaskSubscriptionApi
 import dev.bpmcrafters.processengineapi.task.UserTaskCompletionApi
 import dev.bpmcrafters.processengineapi.test.ProcessTestHelper
-import org.camunda.bpm.engine.ProcessEngine
-import org.camunda.bpm.engine.RuntimeService
+import org.operaton.bpm.engine.ProcessEngine
+import org.operaton.bpm.engine.RuntimeService
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.context.annotation.Bean
 

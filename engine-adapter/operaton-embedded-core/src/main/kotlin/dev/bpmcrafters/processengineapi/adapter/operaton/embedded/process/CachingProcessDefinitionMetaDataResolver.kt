@@ -1,6 +1,6 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.process
 
-import org.camunda.bpm.engine.RepositoryService
+import org.operaton.bpm.engine.RepositoryService
 
 /**
  * Simple in-memory caching resolver for process definition for a given process definition id.

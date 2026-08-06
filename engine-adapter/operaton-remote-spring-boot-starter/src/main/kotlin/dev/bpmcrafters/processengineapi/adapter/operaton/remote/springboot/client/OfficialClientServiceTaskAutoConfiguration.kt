@@ -11,10 +11,10 @@ import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
 import dev.bpmcrafters.processengineapi.task.ServiceTaskCompletionApi
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.annotation.PostConstruct
-import org.camunda.bpm.client.ExternalTaskClient
-import org.camunda.bpm.client.impl.ExternalTaskClientImpl
-import org.camunda.bpm.client.task.ExternalTaskService
-import org.camunda.bpm.client.task.impl.ExternalTaskServiceImpl
+import org.operaton.bpm.client.ExternalTaskClient
+import org.operaton.bpm.client.impl.ExternalTaskClientImpl
+import org.operaton.bpm.client.task.ExternalTaskService
+import org.operaton.bpm.client.task.impl.ExternalTaskServiceImpl
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.AutoConfigureAfter

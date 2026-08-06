@@ -2,6 +2,8 @@ package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery
 
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.process.CachingProcessDefinitionMetaDataResolver
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.subscription.OperatonTaskSubscriptionApiImpl
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.testing.mockTaskQuery
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.testing.taskFake
 import dev.bpmcrafters.processengineapi.impl.task.InMemSubscriptionRepository
 import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
 import dev.bpmcrafters.processengineapi.impl.task.TaskSubscriptionHandle
@@ -9,11 +11,9 @@ import dev.bpmcrafters.processengineapi.task.TaskInformation
 import dev.bpmcrafters.processengineapi.task.TaskType
 import dev.bpmcrafters.processengineapi.task.support.UserTaskSupport
 import org.assertj.core.api.Assertions.assertThat
-import org.camunda.bpm.engine.TaskService
-import org.camunda.bpm.engine.task.Task
-import org.camunda.bpm.engine.task.TaskQuery
-import org.camunda.community.mockito.QueryMocks
-import org.camunda.community.mockito.task.TaskFake
+import org.operaton.bpm.engine.TaskService
+import org.operaton.bpm.engine.task.Task
+import org.operaton.bpm.engine.task.TaskQuery
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
@@ -55,10 +55,8 @@ internal class EmbeddedPullUserTaskDeliveryTest {
     assertThat(tasks.map { it.id }.distinct()).hasSize(taskCount)
     subscriptionRepository.getTaskSubscriptions().forEach { subscriptionRepository.deleteTaskSubscription(it) }
 
-    QueryMocks.mockTaskQuery(taskService).list(
-      tasks
-    )
-
+    val taskQuery = mockTaskQuery(taskService)
+    whenever(taskQuery.list()).thenReturn(tasks)
   }
 
   @Test
@@ -193,13 +191,12 @@ internal class EmbeddedPullUserTaskDeliveryTest {
     assertThat(terminatedTasks).hasSize(leakingTaskCount)
   }
 
-  private fun randomTask() = TaskFake
-    .builder()
-    .id(UUID.randomUUID().toString())
-    .processDefinitionId("process-definition-id")
-    .assignee("kermit")
-    .name("Perform user task")
-    .createTime(Date.from(Instant.now()))
-    .lastUpdated(Date.from(Instant.now().plusSeconds(1)))
-    .build()
+  private fun randomTask() = taskFake(
+    id = UUID.randomUUID().toString(),
+    processDefinitionId = "process-definition-id",
+    assignee = "kermit",
+    name = "Perform user task",
+    createTime = Date.from(Instant.now()),
+    lastUpdated = Date.from(Instant.now().plusSeconds(1))
+  )
 }

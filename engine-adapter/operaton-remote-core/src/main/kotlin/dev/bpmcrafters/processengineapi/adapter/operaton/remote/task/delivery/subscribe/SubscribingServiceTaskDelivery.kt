@@ -8,10 +8,10 @@ import dev.bpmcrafters.processengineapi.impl.task.filterBySubscription
 import dev.bpmcrafters.processengineapi.task.TaskInformation
 import dev.bpmcrafters.processengineapi.task.TaskType
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.camunda.bpm.client.ExternalTaskClient
-import org.camunda.bpm.client.task.ExternalTask
-import org.camunda.bpm.client.topic.TopicSubscription
-import org.camunda.bpm.client.topic.TopicSubscriptionBuilder
+import org.operaton.bpm.client.ExternalTaskClient
+import org.operaton.bpm.client.task.ExternalTask
+import org.operaton.bpm.client.topic.TopicSubscription
+import org.operaton.bpm.client.topic.TopicSubscriptionBuilder
 
 private val logger = KotlinLogging.logger {}
 

@@ -18,8 +18,8 @@ import dev.bpmcrafters.processengineapi.task.TaskSubscriptionApi
 import dev.bpmcrafters.processengineapi.task.UserTaskCompletionApi
 import dev.bpmcrafters.processengineapi.test.ProcessTestHelper
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.camunda.bpm.client.spi.DataFormatConfigurator
-import org.camunda.bpm.client.variable.impl.format.json.JacksonJsonDataFormat
+import org.operaton.bpm.client.spi.DataFormatConfigurator
+import org.operaton.bpm.client.variable.impl.format.json.JacksonJsonDataFormat
 import org.camunda.community.rest.client.FeignClientConfiguration
 import org.camunda.community.rest.client.api.ProcessInstanceApiClient
 import org.camunda.community.rest.variables.ValueMapperConfiguration

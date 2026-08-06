@@ -1,7 +1,7 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.modification
 
-import org.camunda.bpm.engine.TaskService
-import org.camunda.bpm.engine.task.IdentityLinkType
+import org.operaton.bpm.engine.TaskService
+import org.operaton.bpm.engine.task.IdentityLinkType
 
 fun TaskService.getAllCandidates(taskId: String) = this
   .getIdentityLinksForTask(taskId)

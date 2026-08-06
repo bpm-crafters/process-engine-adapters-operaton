@@ -7,10 +7,10 @@ import dev.bpmcrafters.processengineapi.MetaInfoAware
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineCommandExecutor
 import dev.bpmcrafters.processengineapi.decision.*
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.camunda.bpm.dmn.engine.DmnDecisionResult
-import org.camunda.bpm.dmn.engine.DmnDecisionResultEntries
-import org.camunda.bpm.engine.DecisionService
-import org.camunda.bpm.engine.dmn.DecisionsEvaluationBuilder
+import org.operaton.bpm.dmn.engine.DmnDecisionResult
+import org.operaton.bpm.dmn.engine.DmnDecisionResultEntries
+import org.operaton.bpm.engine.DecisionService
+import org.operaton.bpm.engine.dmn.DecisionsEvaluationBuilder
 import java.util.concurrent.CompletableFuture
 
 private val logger = KotlinLogging.logger {}

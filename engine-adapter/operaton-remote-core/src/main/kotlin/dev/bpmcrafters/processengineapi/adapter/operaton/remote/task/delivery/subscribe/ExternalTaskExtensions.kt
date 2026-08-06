@@ -4,7 +4,7 @@ import dev.bpmcrafters.processengineapi.CommonRestrictions
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.task.delivery.metaOf
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.task.delivery.toDateString
 import dev.bpmcrafters.processengineapi.task.TaskInformation
-import org.camunda.bpm.client.task.ExternalTask
+import org.operaton.bpm.client.task.ExternalTask
 
 fun ExternalTask.toTaskInformation(): TaskInformation = TaskInformation(
   taskId = this.id,

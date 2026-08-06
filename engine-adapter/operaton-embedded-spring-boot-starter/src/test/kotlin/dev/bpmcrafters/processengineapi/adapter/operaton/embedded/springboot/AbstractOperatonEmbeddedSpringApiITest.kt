@@ -2,7 +2,7 @@ package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.springboot
 
 import dev.bpmcrafters.processengineapi.test.JGivenBaseIntegrationTest
 import dev.bpmcrafters.processengineapi.test.ProcessTestHelper
-import org.camunda.bpm.engine.RepositoryService
+import org.operaton.bpm.engine.RepositoryService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.springframework.beans.factory.annotation.Autowired

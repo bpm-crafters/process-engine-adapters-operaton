@@ -8,7 +8,7 @@ import dev.bpmcrafters.processengineapi.task.CompleteTaskCmd
 import dev.bpmcrafters.processengineapi.task.TaskInformation
 import dev.bpmcrafters.processengineapi.task.UserTaskCompletionApi
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.camunda.bpm.engine.TaskService
+import org.operaton.bpm.engine.TaskService
 import java.util.concurrent.CompletableFuture
 
 private val logger = KotlinLogging.logger {}

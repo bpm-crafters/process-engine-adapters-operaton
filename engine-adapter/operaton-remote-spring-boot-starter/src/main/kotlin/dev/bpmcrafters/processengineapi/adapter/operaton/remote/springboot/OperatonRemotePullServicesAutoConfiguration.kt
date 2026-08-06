@@ -60,7 +60,7 @@ class OperatonRemotePullServicesAutoConfiguration {
   fun taskScheduler(): TaskScheduler {
     val threadPoolTaskScheduler = ThreadPoolTaskScheduler()
     threadPoolTaskScheduler.poolSize = 2 // we have two schedulers, one for user tasks one for service tasks
-    threadPoolTaskScheduler.threadNamePrefix = "OPERATON-REMOTE-SCHEDULER-"
+    threadPoolTaskScheduler.setThreadNamePrefix("OPERATON-REMOTE-SCHEDULER-")
     return threadPoolTaskScheduler
   }
 

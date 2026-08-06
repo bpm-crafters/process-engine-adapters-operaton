@@ -29,11 +29,11 @@ import dev.bpmcrafters.processengineapi.task.support.UserTaskSupport
 import org.assertj.core.api.Assertions
 import org.assertj.core.util.Lists
 import org.awaitility.Awaitility
-import org.camunda.bpm.engine.ProcessEngineServices
-import org.camunda.bpm.engine.history.HistoricActivityInstance
-import org.camunda.bpm.engine.runtime.ProcessInstance
-import org.camunda.bpm.engine.test.assertions.bpmn.BpmnAwareTests
-import org.camunda.bpm.engine.variable.VariableMap
+import org.operaton.bpm.engine.ProcessEngineServices
+import org.operaton.bpm.engine.history.HistoricActivityInstance
+import org.operaton.bpm.engine.runtime.ProcessInstance
+import org.operaton.bpm.engine.test.assertions.bpmn.BpmnAwareTests
+import org.operaton.bpm.engine.variable.VariableMap
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.Executors

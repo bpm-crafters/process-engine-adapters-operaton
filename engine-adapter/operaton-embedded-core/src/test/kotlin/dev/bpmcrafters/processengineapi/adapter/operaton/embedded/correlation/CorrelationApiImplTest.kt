@@ -2,11 +2,11 @@ package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.correlation
 
 import dev.bpmcrafters.processengineapi.CommonRestrictions
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineCommandExecutor
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.testing.mockMessageCorrelation
 import dev.bpmcrafters.processengineapi.correlation.CorrelateMessageCmd
 import dev.bpmcrafters.processengineapi.correlation.Correlation
-import org.camunda.bpm.engine.RuntimeService
-import org.camunda.bpm.engine.runtime.MessageCorrelationBuilder
-import org.camunda.community.mockito.ProcessExpressions
+import org.operaton.bpm.engine.RuntimeService
+import org.operaton.bpm.engine.runtime.MessageCorrelationBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.mock
@@ -25,7 +25,7 @@ class CorrelationApiImplTest {
 
   @BeforeEach
   fun setUp() {
-    correlation = ProcessExpressions.mockMessageCorrelation(runtimeService, "messageName")
+    correlation = mockMessageCorrelation(runtimeService, "messageName")
   }
 
   @Test

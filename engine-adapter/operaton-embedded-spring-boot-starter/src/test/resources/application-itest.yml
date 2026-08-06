@@ -19,7 +19,7 @@ dev:
             delivery-strategy: embedded_scheduled
             execute-initial-pull-on-startup: false
 
-camunda:
+operaton:
   bpm:
     generic-properties:
       properties:

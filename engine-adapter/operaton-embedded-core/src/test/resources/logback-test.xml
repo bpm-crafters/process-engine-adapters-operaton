@@ -10,7 +10,7 @@
   </root>
 
   <logger name="dev.bpmcrafters" level="INFO" />
-  <logger name="org.camunda.bpm.engine" level="WARN" />
-  <logger name="org.camunda.bpm.engine.test" level="INFO" />
+  <logger name="org.operaton.bpm.engine" level="WARN" />
+  <logger name="org.operaton.bpm.engine.test" level="INFO" />
 
 </configuration>

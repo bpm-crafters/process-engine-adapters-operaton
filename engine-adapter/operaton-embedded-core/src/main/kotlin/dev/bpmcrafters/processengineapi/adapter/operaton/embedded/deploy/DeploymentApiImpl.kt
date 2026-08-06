@@ -7,8 +7,8 @@ import dev.bpmcrafters.processengineapi.deploy.DeployBundleCommand
 import dev.bpmcrafters.processengineapi.deploy.DeploymentApi
 import dev.bpmcrafters.processengineapi.deploy.DeploymentInformation
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.camunda.bpm.engine.RepositoryService
-import org.camunda.bpm.engine.repository.Deployment
+import org.operaton.bpm.engine.RepositoryService
+import org.operaton.bpm.engine.repository.Deployment
 import java.util.concurrent.CompletableFuture
 
 private val logger = KotlinLogging.logger {}

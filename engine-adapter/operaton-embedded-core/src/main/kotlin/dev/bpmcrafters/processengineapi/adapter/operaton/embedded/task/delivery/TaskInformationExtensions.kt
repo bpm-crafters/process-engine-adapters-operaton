@@ -2,10 +2,10 @@ package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery
 
 import dev.bpmcrafters.processengineapi.CommonRestrictions
 import dev.bpmcrafters.processengineapi.task.TaskInformation
-import org.camunda.bpm.engine.delegate.DelegateTask
-import org.camunda.bpm.engine.externaltask.LockedExternalTask
-import org.camunda.bpm.engine.task.IdentityLink
-import org.camunda.bpm.engine.task.Task
+import org.operaton.bpm.engine.delegate.DelegateTask
+import org.operaton.bpm.engine.externaltask.LockedExternalTask
+import org.operaton.bpm.engine.task.IdentityLink
+import org.operaton.bpm.engine.task.Task
 import java.util.*
 
 fun Task.toTaskInformation(candidates: Set<IdentityLink>, processDefinitionKey: String? = null) =

@@ -6,8 +6,8 @@ import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery.
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery.pull.EmbeddedPullServiceTaskDeliveryMetrics
 import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
-import org.camunda.bpm.engine.ExternalTaskService
-import org.camunda.bpm.spring.boot.starter.event.ProcessApplicationStartedEvent
+import org.operaton.bpm.engine.ExternalTaskService
+import org.operaton.bpm.spring.boot.starter.event.ProcessApplicationStartedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order

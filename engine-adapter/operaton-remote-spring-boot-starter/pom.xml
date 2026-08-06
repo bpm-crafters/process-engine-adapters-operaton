@@ -35,19 +35,19 @@
       <artifactId>spring-boot-configuration-processor</artifactId>
       <optional>true</optional>
     </dependency>
-    <!-- Use subscription-based delivery using official Camunda client -->
+    <!-- Use subscription-based delivery using official Operaton client -->
     <dependency>
-      <groupId>org.camunda.bpm.springboot</groupId>
-      <artifactId>camunda-bpm-spring-boot-starter-external-task-client</artifactId>
-      <version>7.24.0</version>
+      <groupId>org.operaton.bpm.springboot</groupId>
+      <artifactId>operaton-bpm-spring-boot-starter-external-task-client</artifactId>
+      <version>${operaton.version}</version>
       <optional>true</optional>
     </dependency>
 
-    <!-- Use for Camunda REST API by provided Feign Client -->
+    <!-- Use for the engine's Camunda-7-compatible REST API by provided Feign Client -->
     <dependency>
       <groupId>io.holunda.c7</groupId>
-      <artifactId>c7-rest-client-spring-boot-starter-feign</artifactId>
-      <version>${c7.version}</version>
+      <artifactId>c7-rest-client-spring-boot-starter-feign-4</artifactId>
+      <version>${c7-rest-client.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -97,6 +97,7 @@
                 <bannedDependencies>
                   <excludes>
                     <exclude>org.camunda.bpm:camunda-engine</exclude>
+                    <exclude>org.operaton.bpm:operaton-engine</exclude>
                     <exclude>io.holunda.camunda-api:camunda-bpm-engine-api</exclude>
                   </excludes>
                 </bannedDependencies>
