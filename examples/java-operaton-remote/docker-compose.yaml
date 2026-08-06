@@ -1,0 +1,9 @@
+services:
+
+  operaton:
+    image: operaton/operaton:2.1.3
+    pull_policy: always
+    ports:
+      - '9090:8080'
+    environment:
+     OPERATON_BPM_DEFAULT-SERIALIZATION-FORMAT: "application/json"

@@ -19,9 +19,9 @@ This repository contains the Operaton implementation of the BPM Crafters Process
   - `operaton-remote-spring-boot-starter`: Spring Boot auto-configuration, client wiring, and polling/subscription setup for the remote adapter.
 - `examples`: runnable sample applications and shared example code.
   - `java-common-fixture`: shared Java example domain, ports, adapters, controllers, and task handlers.
-  - `java-c7-embedded`: embedded example application and tests.
-  - `java-c7-remote`: remote example application.
-  - `java-c7-remote-sb4`: remote example variant for newer Spring Boot setup.
+  - `java-operaton-embedded`: embedded example application (Spin + Jackson 2) and tests.
+  - `java-operaton-embedded-jackson3`: embedded example variant without Spin, using Jackson 3.
+  - `java-operaton-remote`: remote example application against an Operaton engine in Docker.
 - `features`: project feature implementation plans, named with an issue number follwed by caption.
 - `mvnw`: project Maven wrapper entrypoint.
 - `pom.xml`: root aggregator POM, shared dependency management, build plugin defaults, and example profile activation.

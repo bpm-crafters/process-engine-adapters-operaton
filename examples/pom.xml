@@ -24,11 +24,9 @@
 
   <modules>
     <module>java-common-fixture</module>
-    <module>java-c7-embedded</module>
-    <module>java-c7-embedded-sb4</module>
-    <module>java-c7-embedded-sb4-jackson3</module>
-    <module>java-c7-remote</module>
-    <module>java-c7-remote-sb4</module>
+    <module>java-operaton-embedded</module>
+    <module>java-operaton-embedded-jackson3</module>
+    <module>java-operaton-remote</module>
   </modules>
 
   <dependencyManagement>
@@ -63,7 +61,7 @@
       <dependency>
         <groupId>org.springdoc</groupId>
         <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-        <version>2.8.17</version>
+        <version>3.0.3</version>
       </dependency>
 
     </dependencies>
