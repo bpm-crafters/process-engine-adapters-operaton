@@ -4,13 +4,13 @@
 
   <parent>
     <groupId>dev.bpm-crafters.process-engine-examples</groupId>
-    <artifactId>process-engine-api-example-root-c7</artifactId>
+    <artifactId>process-engine-api-example-root-operaton</artifactId>
     <version>2026.07.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>process-engine-api-example-java-c7-common-fixture</artifactId>
-  <name>Example: Java C7 Common Fixture</name>
+  <artifactId>process-engine-api-example-java-operaton-common-fixture</artifactId>
+  <name>Example: Java Operaton Common Fixture</name>
 
   <dependencies>
     <dependency>

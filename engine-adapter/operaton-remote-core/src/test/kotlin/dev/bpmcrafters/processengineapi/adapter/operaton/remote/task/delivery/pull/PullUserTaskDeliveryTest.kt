@@ -1,0 +1,201 @@
+package dev.bpmcrafters.processengineapi.adapter.operaton.remote.task.delivery.pull
+
+import dev.bpmcrafters.processengineapi.adapter.operaton.remote.TestFixtures
+import dev.bpmcrafters.processengineapi.adapter.operaton.remote.process.CachingProcessDefinitionMetaDataResolver
+import dev.bpmcrafters.processengineapi.adapter.operaton.remote.task.TaskSubscriptionApiImpl
+import dev.bpmcrafters.processengineapi.impl.task.InMemSubscriptionRepository
+import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
+import dev.bpmcrafters.processengineapi.impl.task.TaskSubscriptionHandle
+import dev.bpmcrafters.processengineapi.task.TaskInformation
+import dev.bpmcrafters.processengineapi.task.TaskType
+import dev.bpmcrafters.processengineapi.task.support.UserTaskSupport
+import org.assertj.core.api.Assertions.assertThat
+import org.camunda.community.rest.client.api.TaskApiClient
+import org.camunda.community.rest.client.model.IdentityLinkDto
+import org.camunda.community.rest.client.model.TaskWithAttachmentAndCommentDto
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import org.springframework.http.ResponseEntity
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.Executors
+import java.util.concurrent.atomic.AtomicInteger
+
+internal class PullUserTaskDeliveryTest {
+
+  private val keys = mutableMapOf("process-definition-id" to "process-definition-key")
+  private val versionTags = mutableMapOf<String, String?>("process-definition-id" to null)
+  private val taskApiClient: TaskApiClient = mock()
+  private val subscriptionRepository: SubscriptionRepository = InMemSubscriptionRepository()
+
+  private val taskCount = 100
+  private val repeatCount = 100
+  private val tasks: List<TaskWithAttachmentAndCommentDto> = (0..<taskCount).map {
+    randomTask()
+  }
+
+  private val embeddedPullUserTaskDelivery = PullUserTaskDelivery(
+    subscriptionRepository = subscriptionRepository,
+    processDefinitionMetaDataResolver = CachingProcessDefinitionMetaDataResolver(
+      processDefinitionApiClient = mock(),
+      keys = keys,
+      versionTags = versionTags
+    ),
+    executorService = Executors.newFixedThreadPool(3),
+    taskApiClient = taskApiClient,
+    valueMapper = TestFixtures.valueMapper(),
+    deserializeOnServer = false
+  )
+
+  @BeforeEach
+  fun setup() {
+
+    whenever(taskApiClient.queryTasks(any(), any(), any()))
+      .thenReturn(ResponseEntity.ok(tasks))
+
+    whenever(taskApiClient.getIdentityLinks(any(), anyOrNull()))
+      .thenReturn(ResponseEntity.ok(listOf(IdentityLinkDto().userId("kermit").type("user"))))
+
+    whenever(taskApiClient.getTaskVariables(any(), any()))
+      .thenReturn(ResponseEntity.ok(mapOf()))
+
+    assertThat(tasks).hasSize(taskCount)
+    assertThat(tasks.map { it.id }.distinct()).hasSize(taskCount)
+    subscriptionRepository.getTaskSubscriptions().forEach { subscriptionRepository.deleteTaskSubscription(it) }
+
+  }
+
+  @Test
+  fun `deliver tasks directly`() {
+
+    // given
+    val deliveredDirectly = ConcurrentHashMap<String, TaskInformation>()
+    val terminatedDirectly = ConcurrentHashMap<String, String>()
+
+    subscriptionRepository.createTaskSubscription(
+      TaskSubscriptionHandle(
+        taskType = TaskType.USER,
+        restrictions = mapOf(),
+        taskDescriptionKey = null,
+        payloadDescription = null,
+        action = { taskInformation, _ -> synchronized(deliveredDirectly) { deliveredDirectly[taskInformation.taskId] = taskInformation } },
+        termination = { taskInformation -> synchronized(terminatedDirectly) { terminatedDirectly[taskInformation.taskId] = taskInformation.taskId } }
+      )
+    )
+
+    repeat(repeatCount) {
+      embeddedPullUserTaskDelivery.refresh()
+    }
+
+    assertThat(terminatedDirectly).hasSize(0)
+    assertThat(deliveredDirectly).hasSize(tasks.size)
+  }
+
+  @Test
+  fun `deliver via user task support`() {
+    val userTaskSupport = UserTaskSupport()
+
+    val deliveredViaUserTaskSupport = ConcurrentHashMap<String, TaskInformation>()
+    val terminatedViaUserTaskSupport = ConcurrentHashMap<String, String>()
+
+
+    userTaskSupport.subscribe(taskSubscriptionApi = TaskSubscriptionApiImpl(subscriptionRepository), restrictions = mapOf(), payloadDescription = null)
+    userTaskSupport.addHandler { taskInformation, _ ->
+      synchronized(deliveredViaUserTaskSupport) {
+        deliveredViaUserTaskSupport[taskInformation.taskId] = taskInformation
+      }
+    }
+    userTaskSupport.addTerminationHandler { taskInformation ->
+      synchronized(terminatedViaUserTaskSupport) {
+        terminatedViaUserTaskSupport[taskInformation.taskId] = taskInformation.taskId
+      }
+    }
+
+    repeat(repeatCount) {
+      embeddedPullUserTaskDelivery.refresh()
+    }
+
+    assertThat(terminatedViaUserTaskSupport).hasSize(0)
+    assertThat(deliveredViaUserTaskSupport).hasSize(tasks.size)
+  }
+
+  @Test
+  fun `matches returns false for unknown restriction`() {
+    val subscription = TaskSubscriptionHandle(
+      taskType = TaskType.USER,
+      restrictions = mapOf("unknown" to "value"),
+      taskDescriptionKey = null,
+      payloadDescription = null,
+      action = { _, _ -> },
+      termination = { }
+    )
+    val task = randomTask()
+
+    with(embeddedPullUserTaskDelivery) {
+      assertThat(subscription.matches(task)).isFalse()
+    }
+  }
+
+  @Test
+  fun `does not fail when task does not match any subscription`() {
+    // given
+    val deliveredDirectly = ConcurrentHashMap<String, TaskInformation>()
+
+    subscriptionRepository.createTaskSubscription(
+      TaskSubscriptionHandle(
+        taskType = TaskType.USER,
+        restrictions = mapOf(dev.bpmcrafters.processengineapi.CommonRestrictions.PROCESS_DEFINITION_KEY to "process-A"),
+        taskDescriptionKey = null,
+        payloadDescription = null,
+        action = { taskInformation, _ -> synchronized(deliveredDirectly) { deliveredDirectly[taskInformation.taskId] = taskInformation } },
+        termination = { }
+      )
+    )
+
+    // when
+    embeddedPullUserTaskDelivery.refresh()
+
+    // then
+    assertThat(deliveredDirectly).isEmpty()
+  }
+
+  @Test
+  fun `failed downstream handler does not leak tasks into user task support`() {
+    val leakingTaskCount = 70
+    val firstRefreshTasks = tasks.take(leakingTaskCount)
+    val userTaskSupport = UserTaskSupport()
+    val terminatedTasks = ConcurrentHashMap<String, String>()
+    val thrownTasks = AtomicInteger()
+
+    whenever(taskApiClient.queryTasks(any(), any(), any()))
+      .thenReturn(ResponseEntity.ok(firstRefreshTasks), ResponseEntity.ok(emptyList()))
+
+    userTaskSupport.subscribe(taskSubscriptionApi = TaskSubscriptionApiImpl(subscriptionRepository), restrictions = mapOf(), payloadDescription = null)
+    userTaskSupport.addHandler { taskInformation, _ ->
+      thrownTasks.incrementAndGet()
+      throw IllegalStateException("boom for ${taskInformation.taskId}")
+    }
+    userTaskSupport.addTerminationHandler { taskInformation ->
+      terminatedTasks[taskInformation.taskId] = taskInformation.taskId
+    }
+
+    embeddedPullUserTaskDelivery.refresh()
+    repeat(3) {
+      embeddedPullUserTaskDelivery.refresh()
+    }
+
+    assertThat(thrownTasks.get()).isEqualTo(leakingTaskCount)
+    assertThat(userTaskSupport.getAllTasks()).isEmpty()
+    assertThat(terminatedTasks).hasSize(leakingTaskCount)
+  }
+
+  private fun randomTask() = TaskWithAttachmentAndCommentDto()
+    .id(UUID.randomUUID().toString())
+    .assignee("kermit")
+    .processDefinitionId("process-definition-id")
+    .name("Perform user task")
+}

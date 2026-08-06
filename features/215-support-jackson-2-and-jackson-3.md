@@ -7,20 +7,20 @@ keeping a hard Jackson 2 import in the core adapter modules.
 
 ## Current State
 
-- `c7-embedded-core` and `c7-remote-core` directly depend on Jackson 2 types through `com.fasterxml.jackson.databind.ObjectMapper`.
+- `operaton-embedded-core` and `operaton-remote-core` directly depend on Jackson 2 types through `com.fasterxml.jackson.databind.ObjectMapper`.
 - The direct coupling is currently in the decision evaluation path:
   - `EvaluateDecisionApiImpl`
   - `DelegatingDmnDecisionResult`
   - `DelegatingDmnDecisionEvaluationOutput`
   - `VariableMapDmnDecisionEvaluationOutput`
-- `c7-adapter-common` exists but currently does not provide shared serialization infrastructure.
-- `c7-embedded-spring-boot-starter` and `c7-remote-spring-boot-starter` wire `ObjectMapper` directly into the adapter beans.
+- `operaton-adapter-common` exists but currently does not provide shared serialization infrastructure.
+- `operaton-embedded-spring-boot-starter` and `operaton-remote-spring-boot-starter` wire `ObjectMapper` directly into the adapter beans.
 
 ## Target Design
 
-### 1. Introduce a serialization SPI in `c7-adapter-common`
+### 1. Introduce a serialization SPI in `operaton-adapter-common`
 
-Add a minimal adapter-owned abstraction in `c7-adapter-common` for the capability the adapter actually needs today: converting decision outputs into requested
+Add a minimal adapter-owned abstraction in `operaton-adapter-common` for the capability the adapter actually needs today: converting decision outputs into requested
 target types.
 
 Expected shape:
@@ -33,7 +33,7 @@ Design constraint:
 - The SPI must not expose Jackson-specific types.
 - The SPI should stay intentionally small and mirror current adapter needs, not the full Jackson API.
 
-### 2. Provide two Jackson-specific implementations in `c7-adapter-common`
+### 2. Provide two Jackson-specific implementations in `operaton-adapter-common`
 
 Implement two adapters behind the common SPI:
 
@@ -42,14 +42,14 @@ Implement two adapters behind the common SPI:
 
 Design constraint:
 
-- Jackson-specific code stays out of `c7-embedded-core` and `c7-remote-core`.
+- Jackson-specific code stays out of `operaton-embedded-core` and `operaton-remote-core`.
 - Only the implementation classes import the corresponding Jackson major version.
-- `c7-adapter-common` must not force either Jackson major onto consumers as a transitive dependency.
+- `operaton-adapter-common` must not force either Jackson major onto consumers as a transitive dependency.
 
 Dependency model:
 
-- the Jackson 2 and Jackson 3 implementation classes in `c7-adapter-common` compile against `provided` dependencies only
-- `c7-adapter-common` must not publish Jackson 2 or Jackson 3 as regular compile/runtime dependencies
+- the Jackson 2 and Jackson 3 implementation classes in `operaton-adapter-common` compile against `provided` dependencies only
+- `operaton-adapter-common` must not publish Jackson 2 or Jackson 3 as regular compile/runtime dependencies
 - the consuming application or Spring Boot platform remains responsible for bringing the matching Jackson major onto the classpath
 - the adapter should integrate with the surrounding ecosystem's JSON stack, not own or override it
 
@@ -60,17 +60,17 @@ Replace all direct `ObjectMapper` constructor arguments in both core modules wit
 Affected classes:
 
 - embedded:
-  - `engine-adapter/c7-embedded-core/.../decision/EvaluateDecisionApiImpl.kt`
-  - `engine-adapter/c7-embedded-core/.../decision/DelegatingDmnDecisionResult.kt`
-  - `engine-adapter/c7-embedded-core/.../decision/DelegatingDmnDecisionEvaluationOutput.kt`
+  - `engine-adapter/operaton-embedded-core/.../decision/EvaluateDecisionApiImpl.kt`
+  - `engine-adapter/operaton-embedded-core/.../decision/DelegatingDmnDecisionResult.kt`
+  - `engine-adapter/operaton-embedded-core/.../decision/DelegatingDmnDecisionEvaluationOutput.kt`
 - remote:
-  - `engine-adapter/c7-remote-core/.../decision/EvaluateDecisionApiImpl.kt`
-  - `engine-adapter/c7-remote-core/.../decision/DelegatingDmnDecisionResult.kt`
-  - `engine-adapter/c7-remote-core/.../decision/VariableMapDmnDecisionEvaluationOutput.kt`
+  - `engine-adapter/operaton-remote-core/.../decision/EvaluateDecisionApiImpl.kt`
+  - `engine-adapter/operaton-remote-core/.../decision/DelegatingDmnDecisionResult.kt`
+  - `engine-adapter/operaton-remote-core/.../decision/VariableMapDmnDecisionEvaluationOutput.kt`
 
 Result:
 
-- both core modules depend on `c7-adapter-common`
+- both core modules depend on `operaton-adapter-common`
 - both core modules no longer import Jackson 2 directly
 
 ### 4. Autoconfigure the correct implementation in both Spring Boot starters
@@ -79,9 +79,9 @@ At starter level, create the serialization bean based on available classes on th
 
 Required behavior:
 
-- `c7-embedded-spring-boot-starter` autoconfigures the Jackson 2-backed serializer when the Jackson 2 classes are available
-- `c7-embedded-spring-boot-starter` autoconfigures the Jackson 3-backed serializer when the Jackson 3 classes are available
-- `c7-remote-spring-boot-starter` does the same
+- `operaton-embedded-spring-boot-starter` autoconfigures the Jackson 2-backed serializer when the Jackson 2 classes are available
+- `operaton-embedded-spring-boot-starter` autoconfigures the Jackson 3-backed serializer when the Jackson 3 classes are available
+- `operaton-remote-spring-boot-starter` does the same
 
 Implementation notes:
 
@@ -104,36 +104,36 @@ serialization is wired into adapter beans.
 
 ### Maven modules
 
-- keep `engine-adapter/c7-adapter-common` as the place for the SPI and the two serializer implementations
-- add `c7-adapter-common` as a dependency of both core modules
+- keep `engine-adapter/operaton-adapter-common` as the place for the SPI and the two serializer implementations
+- add `operaton-adapter-common` as a dependency of both core modules
 
 ### Dependency scopes
 
-- remove Jackson 2 as a required direct dependency from `c7-embedded-core`
+- remove Jackson 2 as a required direct dependency from `operaton-embedded-core`
 - keep Jackson dependencies out of the core modules
-- compile the Jackson-major-specific implementations in `c7-adapter-common` against `provided` dependencies
-- do not expose Jackson 2 or Jackson 3 transitively from `c7-adapter-common`
+- compile the Jackson-major-specific implementations in `operaton-adapter-common` against `provided` dependencies
+- do not expose Jackson 2 or Jackson 3 transitively from `operaton-adapter-common`
 - keep starter modules dependent on the SPI and serializer bean wiring, not on exported Jackson libraries from adapter modules
 - keep version alignment with the consuming Spring Boot BOM wherever possible
 
 Expected dependency outcome:
 
-- `c7-embedded-core`: no direct Jackson dependency
-- `c7-remote-core`: no direct Jackson dependency
-- `c7-adapter-common`: Jackson 2 and Jackson 3 present only as `provided` compile-time inputs for the implementation classes
+- `operaton-embedded-core`: no direct Jackson dependency
+- `operaton-remote-core`: no direct Jackson dependency
+- `operaton-adapter-common`: Jackson 2 and Jackson 3 present only as `provided` compile-time inputs for the implementation classes
 - consuming applications: obtain Jackson from Spring Boot or their own dependency graph
 
 ### BOM
 
-Review `bom/pom.xml` and add `c7-adapter-common` if the module becomes part of the supported public dependency surface.
+Review `bom/pom.xml` and add `operaton-adapter-common` if the module becomes part of the supported public dependency surface.
 
 ## Implementation Steps
 
-1. Add the serialization SPI to `c7-adapter-common`.
-2. Add the Jackson 2 and Jackson 3 implementations to `c7-adapter-common`.
+1. Add the serialization SPI to `operaton-adapter-common`.
+2. Add the Jackson 2 and Jackson 3 implementations to `operaton-adapter-common`.
 3. Refactor embedded decision evaluation classes to use the SPI.
 4. Refactor remote decision evaluation classes to use the SPI.
-5. Update both core POMs to depend on `c7-adapter-common` and remove direct Jackson coupling from core.
+5. Update both core POMs to depend on `operaton-adapter-common` and remove direct Jackson coupling from core.
 6. Update both starter auto-configurations so decision API beans depend on the SPI.
 7. Add Jackson-major-specific auto-configuration for embedded starter.
 8. Add Jackson-major-specific auto-configuration for remote starter.
@@ -163,18 +163,18 @@ Review `bom/pom.xml` and add `c7-adapter-common` if the module becomes part of t
 
 ### Example validation
 
-- `examples/java-c7-embedded` still works on Boot 3
-- `examples/java-c7-remote` still works on Boot 3
-- `examples/java-c7-embedded-sb4` works on Boot 4
-- `examples/java-c7-remote-sb4` works on Boot 4
+- `examples/java-operaton-embedded` still works on Boot 3
+- `examples/java-operaton-remote` still works on Boot 3
+- `examples/java-operaton-embedded-sb4` works on Boot 4
+- `examples/java-operaton-remote` works on Boot 4
 
 ## Acceptance Criteria
 
-- No production class in `c7-embedded-core` or `c7-remote-core` imports Jackson 2 directly.
-- Serialization needed by decision evaluation is provided through `c7-adapter-common`.
+- No production class in `operaton-embedded-core` or `operaton-remote-core` imports Jackson 2 directly.
+- Serialization needed by decision evaluation is provided through `operaton-adapter-common`.
 - Both Jackson 2 and Jackson 3 implementations exist and are selectable by classpath.
 - Embedded and remote starters autoconfigure the matching serializer implementation.
-- `c7-adapter-common` does not export Jackson 2 or Jackson 3 as transitive compile/runtime dependencies.
+- `operaton-adapter-common` does not export Jackson 2 or Jackson 3 as transitive compile/runtime dependencies.
 - The effective Jackson version remains owned by the consuming ecosystem, typically the Spring Boot BOM.
 - Boot 3 examples resolve the Jackson 2 path.
 - Boot 4 examples resolve the Jackson 3 path.

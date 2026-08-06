@@ -1,50 +1,36 @@
 # Examples
 
-## C7 embedded
+All examples run on the root Spring Boot version (4.0.x) against Operaton `2.1.3`.
 
-Module: `java-c7-embedded`
+## Operaton embedded
 
-Port: 8080
-
-## C7 embedded Spring Boot 4
-
-Module: `java-c7-embedded-sb4`
+Module: `java-operaton-embedded`
 
 Port: 8082
 
-Uses Spring Boot `4.1.0` with Camunda 7 CE `7.24.0`. Camunda 7 CE `7.24.0` is the last public CE release on Maven
-Central; maintained Enterprise patch versions need the consuming application to configure its private Camunda
-repositories and dependency versions.
+Serialization profile: embedded Operaton with Spin JSON serialization and Jackson 2. Also ships the Operaton webapp
+(login `admin` / `admin`).
 
-Serialization profile: embedded Camunda 7 with Spin JSON serialization and Jackson 2.
+## Operaton embedded without Spin
 
-## C7 embedded Spring Boot 4 without Spin
-
-Module: `java-c7-embedded-sb4-jackson3`
+Module: `java-operaton-embedded-jackson3`
 
 Port: 8083
 
-Uses Spring Boot `4.1.0` with Camunda 7 CE `7.24.0`.
+Serialization profile: embedded Operaton without Spin and with Jackson 3.
 
-Serialization profile: embedded Camunda 7 without Spin and with Jackson 3.
+## Operaton remote
 
-## C7 remote Spring Boot 4
-
-Module: `java-c7-remote-sb4`
+Module: `java-operaton-remote`
 
 Port: 8081
 
-Uses Spring Boot `4.0.2` with Camunda 7 CE `7.24.0`.
-
-Serialization profile: remote adapter with Jackson 3.
+Serialization profile: remote adapter with Jackson 3. The Operaton engine runs in Docker (see the module's
+`docker-compose.yaml`).
 
 ## Jackson configuration summary
 
 - Spin JSON serialization works with Jackson 2 only.
-- Embedded Camunda 7 with Spin should use the Jackson-2 example.
-- Embedded Camunda 7 with Jackson 3 should not configure Spin JSON serialization.
+- Embedded Operaton with Spin should use the Jackson-2 example.
+- Embedded Operaton with Jackson 3 should not configure Spin JSON serialization.
 - Remote adapter setups can use Jackson 3 because they are not bound to embedded Spin.
-
-## C7 Remote
-
-Camunda Run im Docker
