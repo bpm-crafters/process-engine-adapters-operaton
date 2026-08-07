@@ -41,6 +41,22 @@
       <artifactId>operaton-bpm-spring-boot-starter-external-task-client</artifactId>
       <version>${operaton.version}</version>
     </dependency>
+
+    <!-- The c7-rest-client value mapper deserializes user task payloads with Jackson 2; the fixture's payload
+         records rely on constructor parameter names, so the parameter-names module must be on the runtime classpath -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.module</groupId>
+      <artifactId>jackson-module-parameter-names</artifactId>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
