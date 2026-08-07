@@ -3,6 +3,7 @@ package dev.bpmcrafters.example.common.adapter;
 import dev.bpmcrafters.example.common.adapter.in.process.ExecuteActionTaskHandler;
 import dev.bpmcrafters.example.common.adapter.in.process.SendingTaskHandler;
 import dev.bpmcrafters.example.common.adapter.out.process.UserTaskAdapter;
+import dev.bpmcrafters.example.common.adapter.shared.SimpleProcessWorkflowConst;
 import dev.bpmcrafters.processengineapi.CommonRestrictions;
 import dev.bpmcrafters.processengineapi.task.support.UserTaskSupport;
 import dev.bpmcrafters.processengineapi.task.ServiceTaskCompletionApi;
@@ -35,7 +36,14 @@ public class TaskHandlerConfiguration {
   @Bean
   public UserTaskSupport userTaskSupport(TaskSubscriptionApi taskSubscriptionApi) {
     var support= new UserTaskSupport();
-    support.subscribe(taskSubscriptionApi, CommonRestrictions.builder().build(), null, null);
+    // restrict to the example process: a remote engine may contain user tasks of other processes
+    // whose payloads this application cannot deserialize
+    support.subscribe(
+      taskSubscriptionApi,
+      CommonRestrictions.builder().withProcessDefinitionKey(SimpleProcessWorkflowConst.KEY).build(),
+      null,
+      null
+    );
     return support;
   }
 

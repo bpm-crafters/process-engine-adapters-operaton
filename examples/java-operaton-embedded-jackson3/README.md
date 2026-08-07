@@ -20,7 +20,9 @@ There are some features in the Operaton adapter already. In addition, there are 
 ## How to run
 
 - Build with Maven
-- Start `JavaOperatonExampleApplication`
+- Start `JavaOperatonExampleApplication` from your IDE, or from the command line:
+  `java -jar target/process-engine-api-example-java-operaton-embedded-jackson3-*.jar`
+  (alternatively `../../mvnw spring-boot:run` in this directory)
 - Open http://localhost:8083/swagger-ui/index.html
 - Start process
 - Wait, wait, wait, check the logs, wait...
