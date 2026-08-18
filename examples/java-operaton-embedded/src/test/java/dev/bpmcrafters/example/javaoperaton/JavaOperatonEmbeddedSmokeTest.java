@@ -22,7 +22,7 @@ import static org.awaitility.Awaitility.await;
  * together on Spring Boot 4.
  */
 @SpringBootTest(
-  classes = JavaOperatonExampleApplication.class,
+  classes = JavaOperatonEmbeddedExampleApplication.class,
   webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
   properties = {
     "dev.bpm-crafters.process-api.adapter.operaton-embedded.service-tasks.schedule-delivery-fixed-rate-in-seconds=1",

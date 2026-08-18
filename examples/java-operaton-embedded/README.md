@@ -28,7 +28,7 @@ There are some features in the Operaton adapter already. In addition, there are 
 ## How to run
 
 - Build with Maven
-- Start `JavaOperatonExampleApplication` from your IDE, or from the command line:
+- Start `JavaOperatonEmbeddedExampleApplication` from your IDE, or from the command line:
   `java -jar target/process-engine-api-example-java-operaton-embedded-*.jar`
   (alternatively `../../mvnw spring-boot:run` in this directory)
 - Open http://localhost:8082/swagger-ui/index.html
@@ -42,7 +42,7 @@ There are some features in the Operaton adapter already. In addition, there are 
 
 ## How to run using IntelliJ test script
 - Build with Maven
-- Start `JavaOperatonExampleApplication`
+- Start `JavaOperatonEmbeddedExampleApplication`
 - Run `simple-process-demo.http` script
 - Analyze the results
 - Run `simple-process-demo-failed-user.http` script

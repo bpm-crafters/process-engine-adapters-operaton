@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class JavaOperatonExampleApplication {
+public class JavaOperatonJackson3ExampleApplication {
 
   public static void main(String[] args) {
-    SpringApplication.run(JavaOperatonExampleApplication.class, args);
+    SpringApplication.run(JavaOperatonJackson3ExampleApplication.class, args);
   }
 }
