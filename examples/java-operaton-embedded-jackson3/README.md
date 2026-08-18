@@ -31,3 +31,13 @@ There are some features in the Operaton adapter already. In addition, there are 
 - Wait, wait, wait, check the logs, wait...
 - Correlate message by providing the generated correlation key
 - Hint: don't hurry, the error of correlation is not implemented yet (if you try it before both tasks are executed)
+
+## How to run using IntelliJ test script
+- Build with Maven
+- Start `JavaOperatonJackson3ExampleApplication`
+- Run `simple-process-demo.http` script
+- Analyze the results
+- Run `simple-process-demo-failed-user.http` script
+- Analyze the results
+- Run `main-decision-demo.http` script
+- Analyze the results
