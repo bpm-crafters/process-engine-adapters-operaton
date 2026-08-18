@@ -9,7 +9,7 @@ Module: `java-operaton-embedded`
 Port: 8082
 
 Serialization profile: embedded Operaton with Spin JSON serialization and Jackson 2. Also ships the Operaton webapp
-(login `admin` / `admin`).
+(login `demo` / `demo`).
 
 ## Operaton embedded without Spin
 

@@ -10,6 +10,9 @@ This variant deliberately does not add Operaton Spin. That leaves the adapter fr
 Jackson 3 mapper provided by Spring Boot 4. The sample process still returns a complex object variable, so this example
 relies on the engine's default Java serialization for that variable instead of forcing JSON serialization.
 
+The example also ships the Operaton webapp (Cockpit/Tasklist), reachable at http://localhost:8083/operaton/ with the
+credentials `demo` / `demo`.
+
 ## Features in the example
 
 There are some features in the Operaton adapter already. In addition, there are some features in the example:

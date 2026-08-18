@@ -11,7 +11,7 @@ Jackson 2 ecosystem, the application provides an explicit `AdapterDataConverter`
 `ObjectMapper`. That keeps the adapter serialization path aligned with Spin.
 
 The example also ships the Operaton webapp (Cockpit/Tasklist), reachable at http://localhost:8082/operaton/ with the
-credentials `admin` / `admin`.
+credentials `demo` / `demo`.
 
 ## Features in the example
 
