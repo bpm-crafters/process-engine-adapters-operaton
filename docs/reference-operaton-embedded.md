@@ -48,7 +48,7 @@ matches Spin instead of relying on the default selection.
 
 All embedded adapter properties use the prefix `dev.bpm-crafters.process-api.adapter.operaton-embedded`.
 
-The adapter starter does not bring an embedded Operaton engine on its own. Add it together with an Operaton embedded setup such as `operaton-bpm-spring-boot-starter` or `operaton-bpm-spring-boot-starter-webapp`. With the webapp starter, log in with the admin user configured under `operaton.bpm.admin-user` (the examples use `admin` / `admin`).
+The adapter starter does not bring an embedded Operaton engine on its own. Add it together with an Operaton embedded setup such as `operaton-bpm-spring-boot-starter` or `operaton-bpm-spring-boot-starter-webapp`. With the webapp starter, log in with the admin user configured under `operaton.bpm.admin-user` (the examples use `demo` / `demo`).
 
 ### Minimal classpath
 

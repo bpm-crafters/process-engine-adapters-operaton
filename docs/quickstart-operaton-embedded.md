@@ -33,7 +33,7 @@ equivalent `DataSource`/transaction-manager setup — since the Spring Boot 4 mo
 `spring-boot-starter-jdbc` (or `-data-jpa`) explicitly.
 
 If you add the Operaton webapp starter (`operaton-bpm-spring-boot-starter-webapp`), log in with the admin user you
-configure under `operaton.bpm.admin-user` (the examples use `admin` / `admin`).
+configure under `operaton.bpm.admin-user` (the examples use `demo` / `demo`).
 
 If process variables contain custom objects and `operaton.bpm.default-serialization-format` is set to
 `application/json`, add Operaton Spin with the JSON-Jackson data format, for example:
