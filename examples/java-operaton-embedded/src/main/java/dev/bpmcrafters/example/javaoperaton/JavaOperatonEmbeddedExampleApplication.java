@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Bean;
  * Embedded example with Operaton Spin.
  */
 @SpringBootApplication
-public class JavaOperatonExampleApplication {
+public class JavaOperatonEmbeddedExampleApplication {
 
   @Bean
   public AdapterDataConverter adapterDataConverter() {
@@ -19,6 +19,6 @@ public class JavaOperatonExampleApplication {
   }
 
   public static void main(String[] args) {
-    SpringApplication.run(JavaOperatonExampleApplication.class, args);
+    SpringApplication.run(JavaOperatonEmbeddedExampleApplication.class, args);
   }
 }

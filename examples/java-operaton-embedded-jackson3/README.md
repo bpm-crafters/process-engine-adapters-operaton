@@ -20,7 +20,7 @@ There are some features in the Operaton adapter already. In addition, there are 
 ## How to run
 
 - Build with Maven
-- Start `JavaOperatonExampleApplication` from your IDE, or from the command line:
+- Start `JavaOperatonJackson3ExampleApplication` from your IDE, or from the command line:
   `java -jar target/process-engine-api-example-java-operaton-embedded-jackson3-*.jar`
   (alternatively `../../mvnw spring-boot:run` in this directory)
 - Open http://localhost:8083/swagger-ui/index.html
@@ -31,3 +31,13 @@ There are some features in the Operaton adapter already. In addition, there are 
 - Wait, wait, wait, check the logs, wait...
 - Correlate message by providing the generated correlation key
 - Hint: don't hurry, the error of correlation is not implemented yet (if you try it before both tasks are executed)
+
+## How to run using IntelliJ test script
+- Build with Maven
+- Start `JavaOperatonJackson3ExampleApplication`
+- Run `simple-process-demo.http` script
+- Analyze the results
+- Run `simple-process-demo-failed-user.http` script
+- Analyze the results
+- Run `main-decision-demo.http` script
+- Analyze the results
