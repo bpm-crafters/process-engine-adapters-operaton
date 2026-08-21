@@ -3,6 +3,7 @@
 [![incubating](https://img.shields.io/badge/lifecycle-INCUBATING-orange.svg)](https://github.com/holisticon#open-source-lifecycle)
 [![Development branches](https://github.com/bpm-crafters/process-engine-adapters-operaton/actions/workflows/development.yml/badge.svg)](https://github.com/bpm-crafters/process-engine-adapters-operaton/actions/workflows/development.yml)
 [![Maven Central Version](https://img.shields.io/maven-central/v/dev.bpm-crafters.process-engine-adapters/process-engine-adapter-operaton-bom)](https://maven-badges.herokuapp.com/maven-central/dev.bpm-crafters.process-engine-adapters/process-engine-adapter-operaton-bom)
+[![Compatible with Operaton](https://img.shields.io/badge/Compatible%20with-Operaton%202.1.3-1a7f5a.svg)](https://operaton.org)
 
 ## Purpose of the library
 
@@ -22,7 +23,7 @@ respective [repository](https://github.com/bpm-crafters/process-engine-api-docs)
 
 | Adapter Version | Operaton Version | API Version | Spring Boot |
 |-----------------|------------------|-------------|-------------|
-| next release    | 2.1.3            | 1.7         | 4.0         |
+| [2026.08.1](https://github.com/bpm-crafters/process-engine-adapters-operaton/releases/tag/2026.08.1) | 2.1.3 | 1.7 | 4.0 |
 
 ## Usage
 
