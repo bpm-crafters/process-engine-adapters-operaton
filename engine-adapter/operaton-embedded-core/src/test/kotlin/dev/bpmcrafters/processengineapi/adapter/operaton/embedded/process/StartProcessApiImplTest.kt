@@ -14,6 +14,7 @@ import org.operaton.bpm.engine.RuntimeService
 import org.operaton.bpm.engine.runtime.MessageCorrelationBuilder
 import org.operaton.bpm.engine.runtime.ModificationBuilder
 import org.operaton.bpm.engine.runtime.ProcessInstance
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -32,6 +33,9 @@ class StartProcessApiImplTest {
   @Mock
   private lateinit var runtimeService: RuntimeService
 
+  @Mock
+  private lateinit var processDefinitionMetaDataResolver: ProcessDefinitionMetaDataResolver
+
   private lateinit var startProcessApi: StartProcessApiImpl
 
   @BeforeEach
@@ -39,8 +43,42 @@ class StartProcessApiImplTest {
     startProcessApi = StartProcessApiImpl(
       runtimeService = runtimeService,
       repositoryService = repositoryService,
-      commandExecutor = EngineCommandExecutor { it.run() }
+      commandExecutor = EngineCommandExecutor { it.run() },
+      processDefinitionMetaDataResolver = processDefinitionMetaDataResolver,
     )
+  }
+
+  @Test
+  fun `should return distinct definition key and id in meta when started by definition`() {
+    // given
+    val processInstance = processInstanceFake(id = "someId", processDefinitionId = "simple-process:1:123")
+    whenever(runtimeService.startProcessInstanceByKey(anyString(), anyOrNull(), anyMap())).thenReturn(processInstance)
+    whenever(processDefinitionMetaDataResolver.getProcessDefinitionKey("simple-process:1:123")).thenReturn("simple-process")
+
+    // when
+    val info = startProcessApi.startProcess(StartProcessByDefinitionCmd("simple-process", { emptyMap() })).get()
+
+    // then
+    assertThat(info.meta[CommonRestrictions.PROCESS_DEFINITION_KEY]).isEqualTo("simple-process")
+    assertThat(info.meta[CommonRestrictions.PROCESS_DEFINITION_ID]).isEqualTo("simple-process:1:123")
+  }
+
+  @Test
+  fun `should return distinct definition key and id in meta when started by message`() {
+    // given
+    val processInstance = processInstanceFake(id = "someId", processDefinitionId = "simple-process:1:123")
+    val correlationBuilder: MessageCorrelationBuilder = mock()
+    whenever(correlationBuilder.setVariables(anyMap())).thenReturn(correlationBuilder)
+    whenever(correlationBuilder.correlateStartMessage()).thenReturn(processInstance)
+    whenever(runtimeService.createMessageCorrelation(any())).thenReturn(correlationBuilder)
+    whenever(processDefinitionMetaDataResolver.getProcessDefinitionKey("simple-process:1:123")).thenReturn("simple-process")
+
+    // when
+    val info = startProcessApi.startProcess(StartProcessByMessageCmd("startMessage", { emptyMap() })).get()
+
+    // then
+    assertThat(info.meta[CommonRestrictions.PROCESS_DEFINITION_KEY]).isEqualTo("simple-process")
+    assertThat(info.meta[CommonRestrictions.PROCESS_DEFINITION_ID]).isEqualTo("simple-process:1:123")
   }
 
   @Test

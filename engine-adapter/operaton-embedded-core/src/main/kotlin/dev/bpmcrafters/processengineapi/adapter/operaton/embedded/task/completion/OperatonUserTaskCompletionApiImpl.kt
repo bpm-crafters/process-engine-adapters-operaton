@@ -43,7 +43,9 @@ class OperatonUserTaskCompletionApiImpl(
     return commandExecutor.execute {
       taskService.handleBpmnError(
         cmd.taskId,
-        cmd.errorCode
+        cmd.errorCode,
+        cmd.errorMessage,
+        cmd.get()
       )
       subscriptionRepository.deactivateSubscriptionForTask(cmd.taskId)?.apply {
         termination.accept(TaskInformation(cmd.taskId, emptyMap()).withReason(TaskInformation.COMPLETE))
