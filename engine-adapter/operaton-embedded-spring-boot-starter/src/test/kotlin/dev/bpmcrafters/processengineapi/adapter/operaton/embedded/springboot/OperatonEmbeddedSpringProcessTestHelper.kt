@@ -1,5 +1,6 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.springboot
 
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.process.ProcessDefinitionMetaDataResolver
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.process.toProcessInformation
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery.pull.EmbeddedPullServiceTaskDelivery
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery.pull.EmbeddedPullUserTaskDelivery
@@ -24,6 +25,7 @@ class OperatonEmbeddedSpringProcessTestHelper(
   private val serviceTaskCompletionApi: ServiceTaskCompletionApi,
   private val subscriptionRepository: SubscriptionRepository,
   private val evaluateDecisionApi: EvaluateDecisionApi,
+  private val processDefinitionMetaDataResolver: ProcessDefinitionMetaDataResolver,
 ) : ProcessTestHelper {
 
   override fun getStartProcessApi(): StartProcessApi = startProcessApi
@@ -43,7 +45,7 @@ class OperatonEmbeddedSpringProcessTestHelper(
       .createProcessInstanceQuery()
       .processInstanceId(instanceId)
       .singleResult()
-      .toProcessInformation()
+      .toProcessInformation(processDefinitionMetaDataResolver)
 
   override fun getActiveElements(instanceId: String): Collection<String> =
     runtimeService.getActiveActivityIds(instanceId)
