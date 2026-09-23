@@ -23,6 +23,7 @@ respective [repository](https://github.com/bpm-crafters/process-engine-api-docs)
 
 | Adapter Version | Operaton Version | API Version | Spring Boot |
 |-----------------|------------------|-------------|-------------|
+| [2026.09.1](https://github.com/bpm-crafters/process-engine-adapters-operaton/releases/tag/2026.09.1) | 2.1.3 | 1.7 | 4.0 |
 | [2026.08.1](https://github.com/bpm-crafters/process-engine-adapters-operaton/releases/tag/2026.08.1) | 2.1.3 | 1.7 | 4.0 |
 
 ## Usage
