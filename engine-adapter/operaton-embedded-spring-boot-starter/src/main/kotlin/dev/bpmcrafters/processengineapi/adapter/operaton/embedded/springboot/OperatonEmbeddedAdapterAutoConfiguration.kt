@@ -5,6 +5,7 @@ import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.correlation.Co
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.correlation.SignalApiImpl
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.decision.EvaluateDecisionApiImpl
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.deploy.DeploymentApiImpl
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.process.CachingProcessDefinitionMetaDataResolver
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.process.StartProcessApiImpl
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineCommandExecutor
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.springboot.schedule.DefaultPullServiceTaskDeliveryMetrics
@@ -75,6 +76,7 @@ class OperatonEmbeddedAdapterAutoConfiguration {
     runtimeService = runtimeService,
     repositoryService = repositoryService,
     commandExecutor = commandExecutor,
+    processDefinitionMetaDataResolver = CachingProcessDefinitionMetaDataResolver(repositoryService = repositoryService),
   )
 
   @Bean("operaton-embedded-task-subscription-api")
