@@ -108,6 +108,7 @@ internal class OperatonEmbeddedProcessTestAssertApi(
     await()
       .pollInterval(polling.pollInterval)
       .atMost(polling.timeout)
+      .ignoreExceptionsInstanceOf(IllegalArgumentException::class.java)
       .until(Callable { supplier() }, Predicate { true })
 
   private fun selected(tasks: List<TaskInformation>): TaskInformation {

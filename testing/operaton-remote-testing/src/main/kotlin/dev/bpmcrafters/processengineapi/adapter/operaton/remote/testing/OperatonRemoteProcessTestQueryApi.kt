@@ -1,6 +1,7 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.remote.testing
 
 import dev.bpmcrafters.processengineapi.CommonRestrictions
+import dev.bpmcrafters.processengineapi.adapter.operaton.remote.process.ProcessDefinitionMetaDataResolver
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.process.toProcessInformation
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.task.delivery.toTaskInformation
 import dev.bpmcrafters.processengineapi.process.ProcessInformation
@@ -28,6 +29,7 @@ internal class OperatonRemoteProcessTestQueryApi(
   private val tasks = application.getBean<TaskApiClient>()
   private val externalTasks = application.getBean<ExternalTaskApiClient>()
   private val processes = application.getBean<ProcessInstanceApiClient>()
+  private val metadata = application.getBean<ProcessDefinitionMetaDataResolver>()
 
   override fun getSupportedRestrictions() = SUPPORTED_RESTRICTIONS
 
@@ -45,7 +47,7 @@ internal class OperatonRemoteProcessTestQueryApi(
       .map {
         it.toTaskInformation(
           tasks.getIdentityLinks(it.id!!, "candidate").body.orEmpty().toSet(),
-          NoOpMetadataResolver
+          metadata
         )
       }
       .filter { predicate?.test(it) ?: true }
@@ -69,7 +71,7 @@ internal class OperatonRemoteProcessTestQueryApi(
             .addTopicsItem(FetchExternalTaskTopicDto(topic, EXTERNAL_TASK_LOCK_DURATION_IN_MILLIS))
         ).body.orEmpty()
           .filter { locked -> selected.any { it.id == locked.id } }
-          .map { it.toTaskInformation(NoOpMetadataResolver) }
+          .map { it.toTaskInformation(metadata) }
       }
       .filter { predicate?.test(it) ?: true }
   }
@@ -86,6 +88,7 @@ private fun TaskQueryDto.applyRestrictions(restrictions: Map<String, String>) = 
     when (key) {
       CommonRestrictions.PROCESS_INSTANCE_ID -> processInstanceId(value)
       CommonRestrictions.PROCESS_DEFINITION_ID -> processDefinitionId(value)
+      CommonRestrictions.PROCESS_DEFINITION_KEY -> processDefinitionKey(value)
       CommonRestrictions.ACTIVITY_ID -> taskDefinitionKey(value)
       CommonRestrictions.TENANT_ID -> tenantIdIn(listOf(value))
     }
