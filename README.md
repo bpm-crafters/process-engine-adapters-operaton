@@ -50,4 +50,6 @@ The library contains of the following Maven modules:
 - `process-engine-adapter-operaton-remote-core`: Operaton Remote Adapter implementation
 - `process-engine-adapter-operaton-remote-spring-boot-starter`: Operaton Remote Adapter Spring Boot Starter
 - `process-engine-adapter-operaton-testing`: test fixtures and utilities for testing the adapters
+- `process-engine-adapter-operaton-embedded-testing`: [Process Engine API Testing](https://github.com/bpm-crafters/process-engine-api-testing) provider running an in-memory Operaton engine
+- `process-engine-adapter-operaton-remote-testing`: [Process Engine API Testing](https://github.com/bpm-crafters/process-engine-api-testing) provider running against a remote Operaton engine, started in Testcontainers by default
 - `process-engine-adapter-operaton-bom`: Maven BOM containing dependency definitions.
