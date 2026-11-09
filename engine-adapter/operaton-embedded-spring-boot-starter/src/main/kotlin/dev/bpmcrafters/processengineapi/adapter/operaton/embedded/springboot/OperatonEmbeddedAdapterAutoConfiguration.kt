@@ -1,6 +1,7 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.springboot
 
 import dev.bpmcrafters.processengineapi.adapter.operaton.common.serialization.AdapterDataConverter
+import dev.bpmcrafters.processengineapi.adapter.operaton.common.threading.ThreadContextClassLoaderThreadFactory
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.correlation.CorrelationApiImpl
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.correlation.SignalApiImpl
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.decision.EvaluateDecisionApiImpl
@@ -210,6 +211,7 @@ class OperatonEmbeddedAdapterAutoConfiguration {
     10,
     0L, TimeUnit.MILLISECONDS,
     LinkedBlockingQueue(),
+    ThreadContextClassLoaderThreadFactory(OperatonEmbeddedAdapterAutoConfiguration::class.java.classLoader),
   )
 
   /**
@@ -219,6 +221,9 @@ class OperatonEmbeddedAdapterAutoConfiguration {
   @Bean("operaton-embedded-user-task-worker-executor")
   @ConditionalOnMissingQualifiedBean(beanClass = ExecutorService::class, qualifier = "operaton-embedded-user-task-worker-executor")
   @Qualifier("operaton-embedded-user-task-worker-executor")
-  fun userTaskWorkerExecutor(): ExecutorService = Executors.newFixedThreadPool(10)
+  fun userTaskWorkerExecutor(): ExecutorService = Executors.newFixedThreadPool(
+    10,
+    ThreadContextClassLoaderThreadFactory(OperatonEmbeddedAdapterAutoConfiguration::class.java.classLoader),
+  )
 
 }

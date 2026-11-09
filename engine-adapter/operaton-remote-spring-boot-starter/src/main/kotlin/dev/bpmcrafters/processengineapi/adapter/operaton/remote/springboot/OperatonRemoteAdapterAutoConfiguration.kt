@@ -1,6 +1,7 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.remote.springboot
 
 import dev.bpmcrafters.processengineapi.adapter.operaton.common.serialization.AdapterDataConverter
+import dev.bpmcrafters.processengineapi.adapter.operaton.common.threading.ThreadContextClassLoaderThreadFactory
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.correlation.CorrelationApiImpl
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.correlation.SignalApiImpl
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.decision.EvaluateDecisionApiImpl
@@ -119,7 +120,8 @@ class OperatonRemoteAdapterAutoConfiguration {
       adapterProperties.serviceTasks.workerThreadPoolSize,
       adapterProperties.serviceTasks.workerThreadPoolSize,
       0L, TimeUnit.MILLISECONDS,
-      LinkedBlockingQueue(adapterProperties.serviceTasks.workerThreadPoolQueueCapacity)
+      LinkedBlockingQueue(adapterProperties.serviceTasks.workerThreadPoolQueueCapacity),
+      ThreadContextClassLoaderThreadFactory(OperatonRemoteAdapterAutoConfiguration::class.java.classLoader),
     )
 
   @Bean
@@ -140,7 +142,10 @@ class OperatonRemoteAdapterAutoConfiguration {
   @Bean("operaton-remote-user-task-worker-executor")
   @Qualifier("operaton-remote-user-task-worker-executor")
   @ConditionalOnMissingQualifiedBean(beanClass = ExecutorService::class, qualifier = "operaton-remote-user-task-worker-executor")
-  fun userTaskWorkerExecutor(): ExecutorService = Executors.newFixedThreadPool(10)
+  fun userTaskWorkerExecutor(): ExecutorService = Executors.newFixedThreadPool(
+    10,
+    ThreadContextClassLoaderThreadFactory(OperatonRemoteAdapterAutoConfiguration::class.java.classLoader),
+  )
 
   /**
    * Failure retry supplier.
