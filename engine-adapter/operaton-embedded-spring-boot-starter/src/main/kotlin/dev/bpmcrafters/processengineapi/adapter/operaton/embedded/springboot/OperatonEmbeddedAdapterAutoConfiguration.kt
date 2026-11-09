@@ -42,6 +42,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Conditional
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 private val logger = KotlinLogging.logger {}
 
@@ -200,9 +203,14 @@ class OperatonEmbeddedAdapterAutoConfiguration {
    * This one is used for pull-strategies only.
    */
   @Bean("operaton-embedded-service-task-worker-executor")
-  @ConditionalOnMissingQualifiedBean(beanClass = ExecutorService::class, qualifier = "operaton-embedded-service-task-worker-executor")
+  @ConditionalOnMissingQualifiedBean(beanClass = ThreadPoolExecutor::class, qualifier = "operaton-embedded-service-task-worker-executor")
   @Qualifier("operaton-embedded-service-task-worker-executor")
-  fun serviceTaskWorkerExecutor(): ExecutorService = Executors.newFixedThreadPool(10)
+  fun serviceTaskWorkerExecutor(): ThreadPoolExecutor = ThreadPoolExecutor(
+    10,
+    10,
+    0L, TimeUnit.MILLISECONDS,
+    LinkedBlockingQueue(),
+  )
 
   /**
    * Creates a default fixed thread pool for 10 threads used for process engine worker executions.

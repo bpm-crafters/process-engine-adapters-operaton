@@ -121,7 +121,7 @@ class OperatonEmbeddedSchedulingAutoConfiguration {
     @Qualifier("operaton-embedded-process-definition-meta-data-resolver")
     processDefinitionMetaDataResolver: ProcessDefinitionMetaDataResolver,
     adapterProperties: OperatonEmbeddedAdapterProperties,
-    @Qualifier("operaton-embedded-service-task-worker-executor")
+    @Qualifier("operaton-embedded-user-task-worker-executor")
     executorService: ExecutorService
   ): EmbeddedPullUserTaskDelivery {
     return EmbeddedPullUserTaskDelivery(
