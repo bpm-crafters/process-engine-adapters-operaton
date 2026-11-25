@@ -8,7 +8,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.scheduling.annotation.Scheduled
-import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.TimeUnit.MILLISECONDS
 
 private val logger = KotlinLogging.logger {}
 
@@ -25,8 +25,8 @@ class PullUserTaskDeliveryAutoConfiguration(
 ) {
 
   @Scheduled(
-    fixedDelayString = "#{@'dev.bpm-crafters.process-api.adapter.operaton-remote-dev.bpmcrafters.processengineapi.adapter.operaton.remote.springboot.OperatonRemoteAdapterProperties'.userTasks.scheduleDeliveryFixedRateInSeconds}",
-    timeUnit = SECONDS,
+    fixedDelayString = "#{@'dev.bpm-crafters.process-api.adapter.operaton-remote-dev.bpmcrafters.processengineapi.adapter.operaton.remote.springboot.OperatonRemoteAdapterProperties'.userTasks.scheduleDeliveryIntervalInMilliseconds}",
+    timeUnit = MILLISECONDS,
     scheduler = "operaton-remote-task-scheduler"
   )
   fun refresh() {
