@@ -65,13 +65,13 @@
     </dependency>
 
     <dependency>
-      <groupId>org.operaton.bpm</groupId>
-      <artifactId>operaton-bpm-junit5</artifactId>
+      <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
+      <artifactId>process-engine-adapter-operaton-embedded-testing</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.operaton.bpm</groupId>
-      <artifactId>operaton-bpm-assert</artifactId>
+      <groupId>dev.bpm-crafters.process-engine-api-testing</groupId>
+      <artifactId>process-engine-api-testing-jgiven</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -82,23 +82,6 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.tngtech.jgiven</groupId>
-      <artifactId>jgiven-core</artifactId>
-      <version>${jgiven.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.tngtech.jgiven</groupId>
-      <artifactId>jgiven-junit5</artifactId>
-      <version>${jgiven.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.awaitility</groupId>
-      <artifactId>awaitility-kotlin</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

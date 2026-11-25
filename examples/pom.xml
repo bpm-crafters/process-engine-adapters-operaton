@@ -54,6 +54,16 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
+        <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
+        <artifactId>process-engine-adapter-operaton-embedded-testing</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>dev.bpm-crafters.process-engine-api-testing</groupId>
+        <artifactId>process-engine-api-testing-jgiven</artifactId>
+        <version>${process-engine-api-testing.version}</version>
+      </dependency>
+      <dependency>
         <groupId>dev.bpm-crafters.process-engine-examples</groupId>
         <artifactId>process-engine-api-example-java-operaton-common-fixture</artifactId>
         <version>${project.version}</version>
