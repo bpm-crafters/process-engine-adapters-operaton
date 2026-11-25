@@ -1,16 +1,11 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.springboot.initial
 
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.process.ProcessDefinitionMetaDataResolver
-import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.springboot.initial.OperatonEmbeddedInitialPullUserTasksDeliveryBinding.Companion.ORDER
+import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.springboot.OperatonEmbeddedAdapterProperties
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery.pull.EmbeddedPullUserTaskDelivery
 import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.operaton.bpm.engine.TaskService
-import org.operaton.bpm.spring.boot.starter.event.ProcessApplicationStartedEvent
-import org.springframework.context.event.EventListener
-import org.springframework.core.Ordered
-import org.springframework.core.annotation.Order
-import org.springframework.scheduling.annotation.Async
 import java.util.concurrent.ExecutorService
 
 private val logger = KotlinLogging.logger {}
@@ -20,17 +15,13 @@ private val logger = KotlinLogging.logger {}
  * We are not relying on the pull delivery strategy configured centrally, because for other deliveries we still want to
  * execute an initial pull (e.g. for event-based delivery)
  */
-@Order(ORDER)
 open class OperatonEmbeddedInitialPullUserTasksDeliveryBinding(
     subscriptionRepository: SubscriptionRepository,
     taskService: TaskService,
     processDefinitionMetaDataResolver: ProcessDefinitionMetaDataResolver,
-    executorService: ExecutorService
+    private val executorService: ExecutorService,
+    private val operatonEmbeddedAdapterProperties: OperatonEmbeddedAdapterProperties
 ) {
-
-  companion object {
-    const val ORDER = Ordered.HIGHEST_PRECEDENCE + 2000
-  }
 
   private val pullDelivery = EmbeddedPullUserTaskDelivery(
     subscriptionRepository = subscriptionRepository,
@@ -39,9 +30,15 @@ open class OperatonEmbeddedInitialPullUserTasksDeliveryBinding(
     executorService = executorService
   )
 
-  @EventListener
-  @Async
-  open fun pullUserTasks(event: ProcessApplicationStartedEvent) {
+  open fun pullUserTasks() {
+    if (operatonEmbeddedAdapterProperties.userTasks.executeInitialPullAsync) {
+      executorService.execute { deliverUserTasks() }
+    } else {
+      deliverUserTasks()
+    }
+  }
+
+  private fun deliverUserTasks() {
     logger.trace { "PROCESS-ENGINE-OPERATON-EMBEDDED-103: Delivering user tasks..." }
     pullDelivery.refresh()
     logger.trace { "PROCESS-ENGINE-OPERATON-EMBEDDED-104: Delivered user tasks." }
