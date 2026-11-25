@@ -57,7 +57,7 @@ dev:
           enabled: true
           service-tasks:
             delivery-strategy: remote_scheduled # or remote_subscribed with the official external task client
-            schedule-delivery-fixed-rate-in-seconds: 5
+            schedule-delivery-fixed-rate: 5s
             worker-id: remote-worker
             lock-time-in-seconds: 10
             max-task-count: 2
@@ -67,7 +67,7 @@ dev:
             execute-initial-pull-on-startup: true
           user-tasks:
             delivery-strategy: remote_scheduled
-            schedule-delivery-fixed-rate-in-seconds: 5
+            schedule-delivery-fixed-rate: 5s
             execute-initial-pull-on-startup: false
             deserialize-on-server: false
 
