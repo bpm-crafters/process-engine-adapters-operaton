@@ -166,9 +166,6 @@ class OperatonRemotePullServicesAutoConfiguration {
    */
   @Bean("operaton-remote-user-task-completion-api")
   @Qualifier("operaton-remote-user-task-completion-api")
-  @ConditionalOnUserTaskDeliveryStrategy(
-    strategy = OperatonRemoteAdapterProperties.UserTaskDeliveryStrategy.REMOTE_SCHEDULED
-  )
   fun userTaskCompletionApi(
     taskApiClient: TaskApiClient,
     subscriptionRepository: SubscriptionRepository,
@@ -185,9 +182,6 @@ class OperatonRemotePullServicesAutoConfiguration {
    */
   @Bean("operaton-remote-user-task-modification-api")
   @Qualifier("operaton-remote-user-task-modification-api")
-  @ConditionalOnUserTaskDeliveryStrategy(
-    strategy = OperatonRemoteAdapterProperties.UserTaskDeliveryStrategy.REMOTE_SCHEDULED
-  )
   fun userTaskModificationApi(
     taskApiClient: TaskApiClient,
     valueMapper: ValueMapper
