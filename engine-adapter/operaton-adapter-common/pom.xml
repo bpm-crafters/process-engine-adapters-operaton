@@ -25,6 +25,13 @@
       <version>${jackson3.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <!-- Spring Boot 4 manages an older jackson-core that does not match jackson-databind ${jackson3.version} -->
+      <groupId>tools.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson3.version}</version>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.module</groupId>
