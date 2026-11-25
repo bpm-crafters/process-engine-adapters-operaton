@@ -14,6 +14,9 @@ management:
 springdoc:
   swagger-ui:
     try-it-out-enabled: true
+    enabled: true
+  api-docs:
+    enabled: true
 
 dev:
   bpm-crafters:
@@ -31,9 +34,9 @@ dev:
             worker-thread-pool-size: 2
             max-task-count: 2
           user-tasks:
-            schedule-delivery-fixed-rate: 5s
             delivery-strategy: remote_scheduled
-            execute-initial-pull-on-startup: false
+            schedule-delivery-fixed-rate: 5s
+            execute-initial-pull-on-startup: true
             deserialize-on-server: false
 
 #Just needed if you use remote_subscribed as delivery-strategy for service-tasks
@@ -52,3 +55,4 @@ logging:
   level:
     dev.bpmcrafters.processengineapi: INFO
     dev.bpmcrafters.processengineapi.adapter.operaton.remote.springboot: INFO
+    dev.bpmcrafters.processengineapi.adapter.operaton.remote.springboot.initial: TRACE
