@@ -72,6 +72,8 @@ class OperatonRemoteProcessTestInitializer : ProcessTestInitializer {
 
   private fun startContainer(image: String?): GenericContainer<*> =
     GenericContainer(image ?: OperatonRemoteProcessTestEngine.DEFAULT_IMAGE)
+      // REST only: the invoice example shifts the engine clock into the past while it generates demo data
+      .withCommand("./operaton.sh", "--rest")
       .withEnv("OPERATON_BPM_DEFAULT-SERIALIZATION-FORMAT", "application/json")
       .withExposedPorts(8080)
       .waitingFor(Wait.forHttp("/engine-rest/engine/").forPort(8080))

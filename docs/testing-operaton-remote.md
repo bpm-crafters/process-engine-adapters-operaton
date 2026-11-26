@@ -76,6 +76,6 @@ path, completion, and incident operations. Clock control is not supported for a 
 | Setting | Default | Purpose |
 | --- | --- | --- |
 | `@OperatonRemoteProcessTestEngine.url` | Empty | REST URL of an existing engine. If set, the test does not create or stop a container. |
-| `@OperatonRemoteProcessTestEngine.image` | `operaton/operaton:2.1.3` | Image started by Testcontainers when no URL is supplied. |
+| `@OperatonRemoteProcessTestEngine.image` | `operaton/operaton:2.1.3` | Image started by Testcontainers with `./operaton.sh --rest` when no URL is supplied. |
 | Assertion polling | 100 ms interval, 10 s timeout | Fixed defaults used by the testing provider. |
 | Time travel | Unsupported | Remote clock control is unavailable. |
