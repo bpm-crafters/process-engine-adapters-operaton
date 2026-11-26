@@ -6,7 +6,7 @@
   <parent>
     <groupId>dev.bpm-crafters.process-engine-adapters</groupId>
     <artifactId>process-engine-adapter-operaton-root</artifactId>
-    <version>2026.09.1</version>
+    <version>2026.11.1</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
 
@@ -22,6 +22,13 @@
     <dependency>
       <groupId>tools.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
+      <version>${jackson3.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <!-- Spring Boot 4 manages an older jackson-core that does not match jackson-databind ${jackson3.version} -->
+      <groupId>tools.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
       <version>${jackson3.version}</version>
       <scope>provided</scope>
     </dependency>

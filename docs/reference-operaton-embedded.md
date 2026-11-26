@@ -48,6 +48,13 @@ matches Spin instead of relying on the default selection.
 
 All embedded adapter properties use the prefix `dev.bpm-crafters.process-api.adapter.operaton-embedded`.
 
+### Lifecycle-managed delivery
+
+The embedded starter registers task subscriptions before entering `RUNNING`. Initial pulls then run on entry to
+`RUNNING`; recurring scheduled delivery starts in the same phase and is cancelled at `STOPPING`. Initial pulls run
+synchronously by default, so the lifecycle does not report `RUNNING` until enabled initial pulls have returned. Set
+`execute-initial-pull-async` to run an initial pull on its task worker executor instead.
+
 The adapter starter does not bring an embedded Operaton engine on its own. Add it together with an Operaton embedded setup such as `operaton-bpm-spring-boot-starter` or `operaton-bpm-spring-boot-starter-webapp`. With the webapp starter, log in with the admin user configured under `operaton.bpm.admin-user` (the examples use `demo` / `demo`).
 
 ### Minimal classpath
@@ -112,21 +119,25 @@ Turns the embedded adapter on or off. Default: `true`.
 | Property | Default | Description |
 |----------|---------|-------------|
 | `worker-id` | required | Worker id used for fetch-and-lock and completion calls. |
-| `max-task-count` | `100` | Maximum number of external tasks fetched per pull cycle. |
-| `lock-time-in-seconds` | `10` | Lock duration for fetched external tasks. |
+| `max-task-count` | `100` | Maximum number of external tasks fetched per pull cycle. A pull cycle never fetches more tasks than worker threads are free. |
+| `lock-time-in-seconds` | `10` | Lock duration for fetched external tasks. Must exceed the runtime of the slowest worker, otherwise the task is delivered again (at-least-once). Can be overridden per subscription with the `workerLockDurationInMilliseconds` restriction. |
 | `retry-timeout-in-seconds` | `10` | Timeout used by the default failure retry supplier. |
 | `retries` | `3` | Initial retry count used by the default failure retry supplier. |
 | `delivery-strategy` | required | One of `embedded_scheduled`, `custom`, `disabled`. |
-| `schedule-delivery-fixed-rate-in-seconds` | `13` | Polling interval for `embedded_scheduled`. |
-| `execute-initial-pull-on-startup` | `true` | Triggers one startup pull before the recurring scheduler takes over. |
+| `schedule-delivery-fixed-rate-in-seconds` | `13` | Deprecated, use `schedule-delivery-fixed-rate`. Polling interval for `embedded_scheduled`. |
+| `schedule-delivery-fixed-rate` | not set | Polling delay for `embedded_scheduled` as a `Duration`, e.g. `200ms`. Takes precedence over `schedule-delivery-fixed-rate-in-seconds`. Must be at least `1ms`. A value without unit is read as milliseconds. The delay starts after the previous pull finished, including its handlers. Every pull also runs the cleanup query for locked tasks, so short intervals add engine load. |
+| `execute-initial-pull-on-startup` | `true` | Triggers one initial pull while the process application enters the `RUNNING` lifecycle phase, before the recurring scheduler takes over. |
+| `execute-initial-pull-async` | `false` | Executes the initial pull on the service-task worker executor instead of waiting for it while entering `RUNNING`. |
 
 #### `user-tasks.*`
 
 | Property | Default | Description |
 |----------|---------|-------------|
 | `delivery-strategy` | required | One of `embedded_scheduled`, `custom`, `disabled`. |
-| `schedule-delivery-fixed-rate-in-seconds` | `5` | Polling interval for `embedded_scheduled`. |
-| `execute-initial-pull-on-startup` | `true` | Triggers one startup pull before the recurring scheduler takes over. |
+| `schedule-delivery-fixed-rate-in-seconds` | `5` | Deprecated, use `schedule-delivery-fixed-rate`. Polling interval for `embedded_scheduled`. |
+| `schedule-delivery-fixed-rate` | not set | Polling delay for `embedded_scheduled` as a `Duration`, e.g. `200ms`. Takes precedence over `schedule-delivery-fixed-rate-in-seconds`. Must be at least `1ms`. A value without unit is read as milliseconds. The delay starts after the previous pull finished, including its handlers. Every pull queries the engine, so short intervals add engine load. |
+| `execute-initial-pull-on-startup` | `true` | Triggers one initial pull while the process application enters the `RUNNING` lifecycle phase, before the recurring scheduler takes over. |
+| `execute-initial-pull-async` | `false` | Executes the initial pull on the user-task worker executor instead of waiting for it while entering `RUNNING`. |
 
 ### Example with explicit scheduling settings
 
@@ -145,11 +156,13 @@ dev:
             retry-timeout-in-seconds: 30
             retries: 3
             execute-initial-pull-on-startup: true
-            schedule-delivery-fixed-rate-in-seconds: 10
+            execute-initial-pull-async: false
+            schedule-delivery-fixed-rate: 10s
           user-tasks:
             delivery-strategy: embedded_scheduled
             execute-initial-pull-on-startup: true
-            schedule-delivery-fixed-rate-in-seconds: 10
+            execute-initial-pull-async: false
+            schedule-delivery-fixed-rate: 10s
 ```
 
 ## Message Correlation
@@ -194,6 +207,7 @@ the real type, you want to access if reading the field. For this purpose, `TaskI
 | Key                  | Original Type  | Description                                                                | Example                       |
 |----------------------|----------------|----------------------------------------------------------------------------|-------------------------------|
 | activityId           | String         | Id of the element in BPMN (Task definition key)                            | approve_user_task             |
+| activityInstanceId   | String         | Id of the activity instance of the service task                            | approve_user_task:a1b2c3d4    |
 | processDefinitionId  | String         | Id of process definition (given at deployment time)                        | approval_process:912834729348 |
 | processDefinitionKey | String         | Id of the process element in BPMN (Process Definition key)                 | approval_process              |
 | tenantId             | String         | Tenant Id                                                                  | my_tenant                     |

@@ -3,29 +3,25 @@ package dev.bpmcrafters.example.common.adapter;
 import dev.bpmcrafters.example.common.adapter.in.process.ExecuteActionTaskHandler;
 import dev.bpmcrafters.example.common.adapter.in.process.SendingTaskHandler;
 import dev.bpmcrafters.example.common.adapter.out.process.UserTaskAdapter;
-import dev.bpmcrafters.example.common.adapter.shared.SimpleProcessWorkflowConst;
-import dev.bpmcrafters.processengineapi.CommonRestrictions;
-import dev.bpmcrafters.processengineapi.task.support.UserTaskSupport;
 import dev.bpmcrafters.processengineapi.task.ServiceTaskCompletionApi;
-import dev.bpmcrafters.processengineapi.task.TaskSubscriptionApi;
 import dev.bpmcrafters.processengineapi.task.UserTaskCompletionApi;
+import dev.bpmcrafters.processengineapi.task.support.UserTaskSupport;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class TaskHandlerConfiguration {
 
-  @Bean(initMethod = "register", destroyMethod = "unregister")
+  @Bean
   public ExecuteActionTaskHandler doAction1(
-      TaskSubscriptionApi taskSubscriptionApi,
       ServiceTaskCompletionApi serviceTaskCompletionApi
   ) {
-    return new ExecuteActionTaskHandler(taskSubscriptionApi, serviceTaskCompletionApi);
+    return new ExecuteActionTaskHandler(serviceTaskCompletionApi);
   }
 
-  @Bean(initMethod = "register", destroyMethod = "unregister")
-  public SendingTaskHandler doAction2(TaskSubscriptionApi taskSubscriptionApi, ServiceTaskCompletionApi serviceTaskCompletionApi) {
-    return new SendingTaskHandler(taskSubscriptionApi, serviceTaskCompletionApi);
+  @Bean
+  public SendingTaskHandler doAction2(ServiceTaskCompletionApi serviceTaskCompletionApi) {
+    return new SendingTaskHandler(serviceTaskCompletionApi);
   }
 
   @Bean
@@ -34,17 +30,21 @@ public class TaskHandlerConfiguration {
   }
 
   @Bean
-  public UserTaskSupport userTaskSupport(TaskSubscriptionApi taskSubscriptionApi) {
-    var support= new UserTaskSupport();
-    // restrict to the example process: a remote engine may contain user tasks of other processes
-    // whose payloads this application cannot deserialize
-    support.subscribe(
-      taskSubscriptionApi,
-      CommonRestrictions.builder().withProcessDefinitionKey(SimpleProcessWorkflowConst.KEY).build(),
-      null,
-      null
+  public UserTaskSupport userTaskSupport() {
+    return new UserTaskSupport();
+  }
+
+  @Bean
+  public TaskSubscriptionLifecycleListener taskSubscriptionLifecycleListener(
+      ExecuteActionTaskHandler executeActionTaskHandler,
+      SendingTaskHandler sendingTaskHandler,
+      UserTaskSupport userTaskSupport
+  ) {
+    return new TaskSubscriptionLifecycleListener(
+      executeActionTaskHandler,
+      sendingTaskHandler,
+      userTaskSupport
     );
-    return support;
   }
 
 }

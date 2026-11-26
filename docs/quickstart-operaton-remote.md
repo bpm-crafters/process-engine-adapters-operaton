@@ -57,7 +57,7 @@ dev:
           enabled: true
           service-tasks:
             delivery-strategy: remote_scheduled # or remote_subscribed with the official external task client
-            schedule-delivery-fixed-rate-in-seconds: 5
+            schedule-delivery-fixed-rate: 5s
             worker-id: remote-worker
             lock-time-in-seconds: 10
             max-task-count: 2
@@ -65,9 +65,10 @@ dev:
             worker-thread-pool-size: 2
             worker-thread-pool-queue-capacity: 5
             execute-initial-pull-on-startup: true
+            execute-initial-pull-async: false
           user-tasks:
             delivery-strategy: remote_scheduled
-            schedule-delivery-fixed-rate-in-seconds: 5
+            schedule-delivery-fixed-rate: 5s
             execute-initial-pull-on-startup: false
             deserialize-on-server: false
 
@@ -84,3 +85,7 @@ operaton:
     client:
       base-url: "http://localhost:9090/engine-rest/"
 ```
+
+Initial pulls happen when the process application enters the `RUNNING` lifecycle phase, after task subscriptions
+have been registered. They are synchronous by default. Set `execute-initial-pull-async: true` to submit an initial
+pull to the corresponding worker executor. Scheduled delivery starts at `RUNNING` and is cancelled at `STOPPING`.

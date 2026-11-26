@@ -1,6 +1,7 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.remote.task.delivery.pull
 
 import dev.bpmcrafters.processengineapi.CommonRestrictions
+import dev.bpmcrafters.processengineapi.adapter.operaton.common.threading.withThreadContextClassLoader
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.process.ProcessDefinitionMetaDataResolver
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.task.delivery.RefreshableDelivery
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.task.delivery.ServiceTaskDelivery
@@ -128,7 +129,9 @@ class PullServiceTaskDelivery(
         val variables = valueMapper.mapDtos(lockedTask.variables!!).filterBySubscription(activeSubscription)
         logger.debug { "PROCESS-ENGINE-OPERATON-REMOTE-031: delivering service task ${lockedTask.id}." }
         val taskInformation = toTaskInformation(lockedTask).withReason(CREATE)
-        activeSubscription.action.accept(taskInformation, variables)
+        withThreadContextClassLoader(activeSubscription.action) {
+          activeSubscription.action.accept(taskInformation, variables)
+        }
         logger.debug { "PROCESS-ENGINE-OPERATON-REMOTE-032: successfully delivered service task ${lockedTask.id}." }
         metrics.incrementCompletedTasksCounter(lockedTask.topicName!!)
       } catch (e: Exception) {
@@ -202,12 +205,14 @@ class PullServiceTaskDelivery(
     // deactivate active subscription and handle termination
     val taskSubscriptionHandle = subscriptionRepository.deactivateSubscriptionForTask(taskId)
     if (taskSubscriptionHandle != null) {
-      taskSubscriptionHandle.termination.accept(
-        TaskInformation(
-          taskId = taskId,
-          meta = emptyMap()
-        ).withReason(TaskInformation.DELETE)
-      )
+      withThreadContextClassLoader(taskSubscriptionHandle.termination) {
+        taskSubscriptionHandle.termination.accept(
+          TaskInformation(
+            taskId = taskId,
+            meta = emptyMap()
+          ).withReason(TaskInformation.DELETE)
+        )
+      }
       metrics.incrementTerminatedTasksCounter(taskSubscriptionHandle.taskDescriptionKey ?: "?")
     }
   }
@@ -216,9 +221,11 @@ class PullServiceTaskDelivery(
     val taskSubscriptionHandle = subscriptionRepository.deactivateSubscriptionForTask(taskId)
     if (taskSubscriptionHandle != null) {
       try {
-        taskSubscriptionHandle.termination.accept(
-          TaskInformation(taskId = taskId, meta = emptyMap()).withReason(TaskInformation.DELETE)
-        )
+        withThreadContextClassLoader(taskSubscriptionHandle.termination) {
+          taskSubscriptionHandle.termination.accept(
+            TaskInformation(taskId = taskId, meta = emptyMap()).withReason(TaskInformation.DELETE)
+          )
+        }
       } catch (terminationError: Exception) {
         logger.error { "PROCESS-ENGINE-OPERATON-REMOTE-046: failed cleaning up delivery state for task $taskId: ${terminationError.message}" }
       }
@@ -276,6 +283,7 @@ class PullServiceTaskDelivery(
           CommonRestrictions.ACTIVITY_ID -> it.value == task.activityId
           CommonRestrictions.BUSINESS_KEY -> it.value == task.businessKey
           CommonRestrictions.TENANT_ID -> it.value == task.tenantId
+          CommonRestrictions.WITHOUT_TENANT_ID -> task.tenantId.isNullOrBlank()
           CommonRestrictions.PROCESS_INSTANCE_ID -> it.value == task.processInstanceId
           CommonRestrictions.PROCESS_DEFINITION_KEY -> it.value == task.processDefinitionKey
           CommonRestrictions.PROCESS_DEFINITION_ID -> it.value == task.processDefinitionId

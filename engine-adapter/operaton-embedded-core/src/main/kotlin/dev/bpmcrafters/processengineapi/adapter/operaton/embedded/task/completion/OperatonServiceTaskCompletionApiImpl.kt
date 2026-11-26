@@ -1,6 +1,7 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.completion
 
 import dev.bpmcrafters.processengineapi.Empty
+import dev.bpmcrafters.processengineapi.adapter.operaton.common.threading.withThreadContextClassLoader
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.shared.EngineCommandExecutor
 import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
 import dev.bpmcrafters.processengineapi.task.*
@@ -31,7 +32,9 @@ class OperatonServiceTaskCompletionApiImpl(
         cmd.get()
       )
       subscriptionRepository.deactivateSubscriptionForTask(cmd.taskId)?.apply {
-        termination.accept(TaskInformation(cmd.taskId, emptyMap()).withReason(TaskInformation.COMPLETE))
+        withThreadContextClassLoader(termination) {
+          termination.accept(TaskInformation(cmd.taskId, emptyMap()).withReason(TaskInformation.COMPLETE))
+        }
         logger.debug { "PROCESS-ENGINE-OPERATON-EMBEDDED-007: successfully completed service task ${cmd.taskId}." }
       }
       Empty
@@ -49,7 +52,9 @@ class OperatonServiceTaskCompletionApiImpl(
         cmd.get()
       )
       subscriptionRepository.deactivateSubscriptionForTask(cmd.taskId)?.apply {
-        termination.accept(TaskInformation(cmd.taskId, emptyMap()).withReason(TaskInformation.COMPLETE))
+        withThreadContextClassLoader(termination) {
+          termination.accept(TaskInformation(cmd.taskId, emptyMap()).withReason(TaskInformation.COMPLETE))
+        }
         logger.debug { "PROCESS-ENGINE-OPERATON-EMBEDDED-009: successfully thrown error in service task ${cmd.taskId}." }
       }
       Empty
@@ -70,7 +75,9 @@ class OperatonServiceTaskCompletionApiImpl(
         retryTimeoutInMillis
       )
       subscriptionRepository.deactivateSubscriptionForTask(cmd.taskId)?.apply {
-        termination.accept(TaskInformation(cmd.taskId, emptyMap()).withReason(TaskInformation.COMPLETE))
+        withThreadContextClassLoader(termination) {
+          termination.accept(TaskInformation(cmd.taskId, emptyMap()).withReason(TaskInformation.COMPLETE))
+        }
         logger.debug { "PROCESS-ENGINE-OPERATON-EMBEDDED-011: successfully failed service task ${cmd.taskId} handling." }
       }
       Empty

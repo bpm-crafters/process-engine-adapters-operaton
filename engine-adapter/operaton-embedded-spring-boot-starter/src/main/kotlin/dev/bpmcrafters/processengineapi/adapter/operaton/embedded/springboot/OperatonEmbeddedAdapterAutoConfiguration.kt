@@ -1,6 +1,7 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.springboot
 
 import dev.bpmcrafters.processengineapi.adapter.operaton.common.serialization.AdapterDataConverter
+import dev.bpmcrafters.processengineapi.adapter.operaton.common.threading.ThreadContextClassLoaderThreadFactory
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.correlation.CorrelationApiImpl
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.correlation.SignalApiImpl
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.decision.EvaluateDecisionApiImpl
@@ -22,9 +23,12 @@ import dev.bpmcrafters.processengineapi.correlation.SignalApi
 import dev.bpmcrafters.processengineapi.decision.EvaluateDecisionApi
 import dev.bpmcrafters.processengineapi.deploy.DeploymentApi
 import dev.bpmcrafters.processengineapi.impl.task.InMemSubscriptionRepository
+import dev.bpmcrafters.processengineapi.impl.task.ObservedServiceTaskCompletionApi
+import dev.bpmcrafters.processengineapi.impl.task.ObservedUserTaskCompletionApi
 import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
 import dev.bpmcrafters.processengineapi.process.StartProcessApi
 import dev.bpmcrafters.processengineapi.task.ServiceTaskCompletionApi
+import dev.bpmcrafters.processengineapi.task.TaskExecutionObserver
 import dev.bpmcrafters.processengineapi.task.TaskSubscriptionApi
 import dev.bpmcrafters.processengineapi.task.UserTaskCompletionApi
 import dev.bpmcrafters.processengineapi.task.UserTaskModificationApi
@@ -33,6 +37,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.toolisticon.spring.condition.ConditionalOnMissingQualifiedBean
 import jakarta.annotation.PostConstruct
 import org.operaton.bpm.engine.*
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
@@ -42,6 +47,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Conditional
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadPoolExecutor
+import java.util.concurrent.TimeUnit
 
 private val logger = KotlinLogging.logger {}
 
@@ -81,8 +89,12 @@ class OperatonEmbeddedAdapterAutoConfiguration {
 
   @Bean("operaton-embedded-task-subscription-api")
   @Qualifier("operaton-embedded-task-subscription-api")
-  fun taskSubscriptionApi(subscriptionRepository: SubscriptionRepository): TaskSubscriptionApi = OperatonTaskSubscriptionApiImpl(
-    subscriptionRepository = subscriptionRepository
+  fun taskSubscriptionApi(
+    subscriptionRepository: SubscriptionRepository,
+    observers: ObjectProvider<TaskExecutionObserver>
+  ): TaskSubscriptionApi = OperatonTaskSubscriptionApiImpl(
+    subscriptionRepository = subscriptionRepository,
+    observers = observers.orderedStream().toList()
   )
 
   @Bean("operaton-embedded-correlation-api")
@@ -171,38 +183,57 @@ class OperatonEmbeddedAdapterAutoConfiguration {
     adapterProperties: OperatonEmbeddedAdapterProperties,
     @Qualifier("operaton-embedded-failure-retry-supplier")
     failureRetrySupplier: FailureRetrySupplier,
-    commandExecutor: EngineCommandExecutor
-  ): ServiceTaskCompletionApi =
-    OperatonServiceTaskCompletionApiImpl(
+    commandExecutor: EngineCommandExecutor,
+    observers: ObjectProvider<TaskExecutionObserver>
+  ): ServiceTaskCompletionApi {
+    val completionApi = OperatonServiceTaskCompletionApiImpl(
       workerId = adapterProperties.serviceTasks.workerId,
       externalTaskService = externalTaskService,
       subscriptionRepository = subscriptionRepository,
       failureRetrySupplier = failureRetrySupplier,
       commandExecutor = commandExecutor,
-
     )
+    return if (observers.orderedStream().findAny().isEmpty) {
+      completionApi
+    } else {
+      ObservedServiceTaskCompletionApi(completionApi, observers.orderedStream().toList())
+    }
+  }
 
   @Bean("operaton-embedded-user-task-completion-api")
   @Qualifier("operaton-embedded-user-task-completion-api")
   fun userTaskCompletionApi(
     taskService: TaskService,
     subscriptionRepository: SubscriptionRepository,
-    commandExecutor: EngineCommandExecutor
-  ): UserTaskCompletionApi =
-    OperatonUserTaskCompletionApiImpl(
+    commandExecutor: EngineCommandExecutor,
+    observers: ObjectProvider<TaskExecutionObserver>
+  ): UserTaskCompletionApi {
+    val completionApi = OperatonUserTaskCompletionApiImpl(
       taskService = taskService,
       subscriptionRepository = subscriptionRepository,
       commandExecutor = commandExecutor,
     )
+    return if (observers.orderedStream().findAny().isEmpty) {
+      completionApi
+    } else {
+      ObservedUserTaskCompletionApi(completionApi, observers.orderedStream().toList())
+    }
+  }
 
   /**
    * Creates a default fixed thread pool for 10 threads used for process engine worker executions.
    * This one is used for pull-strategies only.
    */
   @Bean("operaton-embedded-service-task-worker-executor")
-  @ConditionalOnMissingQualifiedBean(beanClass = ExecutorService::class, qualifier = "operaton-embedded-service-task-worker-executor")
+  @ConditionalOnMissingQualifiedBean(beanClass = ThreadPoolExecutor::class, qualifier = "operaton-embedded-service-task-worker-executor")
   @Qualifier("operaton-embedded-service-task-worker-executor")
-  fun serviceTaskWorkerExecutor(): ExecutorService = Executors.newFixedThreadPool(10)
+  fun serviceTaskWorkerExecutor(): ThreadPoolExecutor = ThreadPoolExecutor(
+    10,
+    10,
+    0L, TimeUnit.MILLISECONDS,
+    LinkedBlockingQueue(),
+    ThreadContextClassLoaderThreadFactory(OperatonEmbeddedAdapterAutoConfiguration::class.java.classLoader),
+  )
 
   /**
    * Creates a default fixed thread pool for 10 threads used for process engine worker executions.
@@ -211,6 +242,9 @@ class OperatonEmbeddedAdapterAutoConfiguration {
   @Bean("operaton-embedded-user-task-worker-executor")
   @ConditionalOnMissingQualifiedBean(beanClass = ExecutorService::class, qualifier = "operaton-embedded-user-task-worker-executor")
   @Qualifier("operaton-embedded-user-task-worker-executor")
-  fun userTaskWorkerExecutor(): ExecutorService = Executors.newFixedThreadPool(10)
+  fun userTaskWorkerExecutor(): ExecutorService = Executors.newFixedThreadPool(
+    10,
+    ThreadContextClassLoaderThreadFactory(OperatonEmbeddedAdapterAutoConfiguration::class.java.classLoader),
+  )
 
 }

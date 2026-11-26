@@ -4,6 +4,8 @@ import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.process.Proces
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.springboot.*
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery.pull.EmbeddedPullServiceTaskDeliveryMetrics
 import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
+import dev.bpmcrafters.processengineapi.lifecycle.ProcessApplicationLifecycle
+import dev.bpmcrafters.processengineapi.lifecycle.ProcessApplicationPhase
 import io.github.oshai.kotlinlogging.KotlinLogging
 import jakarta.annotation.PostConstruct
 import org.operaton.bpm.engine.ExternalTaskService
@@ -13,14 +15,13 @@ import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.AutoConfigureAfter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Conditional
-import org.springframework.scheduling.annotation.EnableAsync
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.ThreadPoolExecutor
 
 private val logger = KotlinLogging.logger {}
 
 /**
- * This configuration configures the initial pull bound to the application started event.
+ * This configuration configures the initial pull bound to the process application running phase.
  * It is not relying on any delivery strategies but just configures the initial pull to happen
  * and deliver tasks to the task handlers.
  *
@@ -30,7 +31,6 @@ private val logger = KotlinLogging.logger {}
  */
 @AutoConfiguration
 @AutoConfigureAfter(OperatonEmbeddedAdapterAutoConfiguration::class)
-@EnableAsync
 @Conditional(OperatonEmbeddedAdapterEnabledCondition::class)
 class OperatonEmbeddedInitialPullOnStartupAutoConfiguration {
 
@@ -43,34 +43,42 @@ class OperatonEmbeddedInitialPullOnStartupAutoConfiguration {
   @Qualifier("operaton-embedded-user-task-initial-pull")
   @Conditional(OperatonEmbeddedAdapterUserTaskInitialPullEnabledCondition::class)
   fun configureInitialPullForUserTaskDelivery(
+    lifecycle: ProcessApplicationLifecycle,
     taskService: TaskService,
     @Qualifier("operaton-embedded-process-definition-meta-data-resolver")
     processDefinitionMetaDataResolver: ProcessDefinitionMetaDataResolver,
     subscriptionRepository: SubscriptionRepository,
     @Qualifier("operaton-embedded-user-task-worker-executor")
-    executorService: ExecutorService
+    executorService: ExecutorService,
+    operatonEmbeddedAdapterProperties: OperatonEmbeddedAdapterProperties
   ) = OperatonEmbeddedInitialPullUserTasksDeliveryBinding(
     taskService = taskService,
     subscriptionRepository = subscriptionRepository,
     processDefinitionMetaDataResolver = processDefinitionMetaDataResolver,
-    executorService = executorService
-  )
+    executorService = executorService,
+    operatonEmbeddedAdapterProperties = operatonEmbeddedAdapterProperties
+  ).also { binding ->
+    lifecycle.registerParticipant(ProcessApplicationPhase.RUNNING - 10) { binding.pullUserTasks() }
+  }
 
   @Bean("operaton-embedded-service-task-initial-pull")
   @Qualifier("operaton-embedded-service-task-initial-pull")
   @Conditional(OperatonEmbeddedAdapterServiceTaskInitialPullEnabledCondition::class)
   fun configureInitialPullForExternalServiceTaskDelivery(
+    lifecycle: ProcessApplicationLifecycle,
     externalTaskService: ExternalTaskService,
     subscriptionRepository: SubscriptionRepository,
-    adapterProperties: OperatonEmbeddedAdapterProperties,
+    operatonAdapterProperties: OperatonEmbeddedAdapterProperties,
     @Qualifier("operaton-embedded-service-task-worker-executor")
     executor: ThreadPoolExecutor,
     metrics: EmbeddedPullServiceTaskDeliveryMetrics
   ) = OperatonEmbeddedInitialPullServiceTasksDeliveryBinding(
     externalTaskService = externalTaskService,
     subscriptionRepository = subscriptionRepository,
-    adapterProperties = adapterProperties,
+    operatonAdapterProperties = operatonAdapterProperties,
     executor = executor,
     metrics = metrics
-  )
+  ).also { binding ->
+    lifecycle.registerParticipant(ProcessApplicationPhase.RUNNING - 20) { binding.pullServiceTasks() }
+  }
 }

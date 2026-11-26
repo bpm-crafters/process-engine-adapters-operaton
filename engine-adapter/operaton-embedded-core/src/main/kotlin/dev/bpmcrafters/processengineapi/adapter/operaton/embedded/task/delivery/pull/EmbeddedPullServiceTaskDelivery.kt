@@ -1,6 +1,7 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery.pull
 
 import dev.bpmcrafters.processengineapi.CommonRestrictions
+import dev.bpmcrafters.processengineapi.adapter.operaton.common.threading.withThreadContextClassLoader
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery.ExternalServiceTaskDelivery
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery.pull.EmbeddedPullServiceTaskDeliveryMetrics.DropReason.EXPIRED_WHILE_IN_QUEUE
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery.pull.EmbeddedPullServiceTaskDeliveryMetrics.DropReason.NO_MATCHING_SUBSCRIPTIONS
@@ -20,6 +21,8 @@ import org.operaton.bpm.engine.externaltask.LockedExternalTask
 import java.time.Duration
 import java.time.OffsetDateTime
 import java.util.concurrent.Callable
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -43,6 +46,8 @@ class EmbeddedPullServiceTaskDelivery(
 
   internal val stillLockedTasksGauge = AtomicInteger()
 
+  private val runningTaskIds = ConcurrentHashMap.newKeySet<String>()
+
   init {
     metrics.registerExecutorThreadsUsedGauge(executor::getActiveCount)
     metrics.registerExecutorQueueCapacityGauge(executor.queue::remainingCapacity)
@@ -65,9 +70,10 @@ class EmbeddedPullServiceTaskDelivery(
       return
     }
 
-    val tasksToFetch = maxTasks.coerceAtMost(executor.queue.remainingCapacity())
-    if (tasksToFetch == 0) {
-      logger.trace { "PROCESS-ENGINE-OPERATON-EMBEDDED-044: Task executor queue is full, skipping task fetch" }
+    val freeWorkerThreads = executor.maximumPoolSize - runningTaskIds.size
+    val tasksToFetch = maxTasks.coerceAtMost(freeWorkerThreads)
+    if (tasksToFetch <= 0) {
+      logger.trace { "PROCESS-ENGINE-OPERATON-EMBEDDED-044: No free worker thread, skipping task fetch" }
       metrics.incrementFetchAndLockTasksSkippedCounter(QUEUE_FULL)
       return
     }
@@ -83,7 +89,7 @@ class EmbeddedPullServiceTaskDelivery(
       .groupBy { it.topicName }
       .forEach { (topic, tasks) -> metrics.incrementFetchedAndLockedTasksCounter(topic!!, tasks.size) }
 
-    val taskActionHandlerCallables = lockedTasks
+    lockedTasks
       .asSequence()
       .mapNotNull { lockedTask ->
         val subscription = subscriptions.firstOrNull { subscription -> subscription.matches(lockedTask) }
@@ -93,13 +99,29 @@ class EmbeddedPullServiceTaskDelivery(
           metrics.incrementDroppedTasksCounter(lockedTask.topicName!!, NO_MATCHING_SUBSCRIPTIONS)
           null
         }
-      }.map { (lockedTask, activeSubscription) -> createTaskActionHandlerCallable(lockedTask, activeSubscription) }
-      .toList()
+      }
+      .forEach { (lockedTask, activeSubscription) -> submitUnlessRunning(lockedTask, activeSubscription) }
+  }
 
-    taskActionHandlerCallables
-      .map { executor.submit(it) }
-      .forEach { it.get() }
-
+  private fun submitUnlessRunning(lockedTask: LockedExternalTask, activeSubscription: TaskSubscriptionHandle) {
+    val taskId = lockedTask.id
+    if (!runningTaskIds.add(taskId)) {
+      logger.trace { "PROCESS-ENGINE-OPERATON-EMBEDDED-047: skipping task $taskId since it is still running." }
+      return
+    }
+    val taskActionHandlerCallable = createTaskActionHandlerCallable(lockedTask, activeSubscription)
+    try {
+      executor.submit {
+        try {
+          taskActionHandlerCallable.call()
+        } finally {
+          runningTaskIds.remove(taskId)
+        }
+      }
+    } catch (e: RejectedExecutionException) {
+      runningTaskIds.remove(taskId)
+      throw e
+    }
   }
 
   internal fun createTaskActionHandlerCallable(lockedTask: LockedExternalTask, activeSubscription: TaskSubscriptionHandle): Callable<Unit> =
@@ -120,7 +142,9 @@ class EmbeddedPullServiceTaskDelivery(
             subscriptionRepository.activateSubscriptionForTask(lockedTask.id, activeSubscription)
             val variables = lockedTask.variables.filterBySubscription(activeSubscription)
             logger.debug { "PROCESS-ENGINE-OPERATON-EMBEDDED-031: delivering service task ${lockedTask.id}." }
-            activeSubscription.action.accept(taskInformation, variables)
+            withThreadContextClassLoader(activeSubscription.action) {
+              activeSubscription.action.accept(taskInformation, variables)
+            }
             logger.debug { "PROCESS-ENGINE-OPERATON-EMBEDDED-032: successfully delivered service task ${lockedTask.id}." }
           }
           logger.debug { "PROCESS-ENGINE-OPERATON-REMOTE-032: successfully delivered service task ${lockedTask.id}." }
@@ -168,21 +192,21 @@ class EmbeddedPullServiceTaskDelivery(
     // the remaining tasks don't exist in the engine, lets handle them
     val taskTerminationHandlerCallables = deliveredTaskIdsMissingInEngine.map { createTaskTerminationHandlerCallable(it) }
 
-    taskTerminationHandlerCallables
-      .map { executor.submit(it) }
-      .forEach { it.get() }
+    taskTerminationHandlerCallables.forEach { executor.submit(it) }
   }
 
   internal fun createTaskTerminationHandlerCallable(taskId: String): Callable<Unit> = Callable {
     // deactivate active subscription and handle termination
     val taskSubscriptionHandle = subscriptionRepository.deactivateSubscriptionForTask(taskId)
     if (taskSubscriptionHandle != null) {
-      taskSubscriptionHandle.termination.accept(
-        TaskInformation(
-          taskId = taskId,
-          meta = emptyMap()
-        ).withReason(TaskInformation.DELETE)
-      )
+      withThreadContextClassLoader(taskSubscriptionHandle.termination) {
+        taskSubscriptionHandle.termination.accept(
+          TaskInformation(
+            taskId = taskId,
+            meta = emptyMap()
+          ).withReason(TaskInformation.DELETE)
+        )
+      }
       metrics.incrementTerminatedTasksCounter(taskSubscriptionHandle.taskDescriptionKey ?: "?")
     }
   }
@@ -191,9 +215,11 @@ class EmbeddedPullServiceTaskDelivery(
     val taskSubscriptionHandle = subscriptionRepository.deactivateSubscriptionForTask(taskId = taskId)
     if (taskSubscriptionHandle != null) {
       try {
-        taskSubscriptionHandle.termination.accept(
-          TaskInformation(taskId = taskId, meta = emptyMap()).withReason(TaskInformation.DELETE)
-        )
+        withThreadContextClassLoader(taskSubscriptionHandle.termination) {
+          taskSubscriptionHandle.termination.accept(
+            TaskInformation(taskId = taskId, meta = emptyMap()).withReason(TaskInformation.DELETE)
+          )
+        }
       } catch (terminationError: Exception) {
         logger.error { "PROCESS-ENGINE-OPERATON-EMBEDDED-046: failed cleaning up delivery state for task $taskId: ${terminationError.message}" }
       }
@@ -233,6 +259,7 @@ class EmbeddedPullServiceTaskDelivery(
           CommonRestrictions.ACTIVITY_ID -> it.value == task.activityId
           CommonRestrictions.BUSINESS_KEY -> it.value == task.businessKey
           CommonRestrictions.TENANT_ID -> it.value == task.tenantId
+          CommonRestrictions.WITHOUT_TENANT_ID -> task.tenantId.isNullOrBlank()
           CommonRestrictions.PROCESS_INSTANCE_ID -> it.value == task.processInstanceId
           CommonRestrictions.PROCESS_DEFINITION_KEY -> it.value == task.processDefinitionKey
           CommonRestrictions.PROCESS_DEFINITION_ID -> it.value == task.processDefinitionId

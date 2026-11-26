@@ -1,6 +1,7 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.remote.task.delivery.subscribe
 
 import dev.bpmcrafters.processengineapi.CommonRestrictions
+import dev.bpmcrafters.processengineapi.adapter.operaton.common.threading.withThreadContextClassLoader
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.task.delivery.ServiceTaskDelivery
 import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
 import dev.bpmcrafters.processengineapi.impl.task.TaskSubscriptionHandle
@@ -47,7 +48,9 @@ class SubscribingServiceTaskDelivery(
                     subscriptionRepository.activateSubscriptionForTask(externalTask.id, subscription)
                     val variables = externalTask.allVariables.filterBySubscription(subscription)
                     logger.debug { "PROCESS-ENGINE-OPERATON-REMOTE-031: delivering service task ${externalTask.id}." }
-                    subscription.action.accept(externalTask.toTaskInformation().withReason(TaskInformation.CREATE), variables)
+                    withThreadContextClassLoader(subscription.action) {
+                      subscription.action.accept(externalTask.toTaskInformation().withReason(TaskInformation.CREATE), variables)
+                    }
                     logger.debug { "PROCESS-ENGINE-OPERATON-REMOTE-032: successfully delivered service task ${externalTask.id}." }
                   } catch (e: Exception) {
                     val jobRetries: Int = externalTask.retries?.minus(1) ?: retries
@@ -107,6 +110,7 @@ class SubscribingServiceTaskDelivery(
           CommonRestrictions.ACTIVITY_ID -> it.value == externalTask.activityId
           CommonRestrictions.BUSINESS_KEY -> it.value == externalTask.businessKey
           CommonRestrictions.TENANT_ID -> it.value == externalTask.tenantId
+          CommonRestrictions.WITHOUT_TENANT_ID -> externalTask.tenantId.isNullOrBlank()
           CommonRestrictions.PROCESS_INSTANCE_ID -> it.value == externalTask.processInstanceId
           CommonRestrictions.PROCESS_DEFINITION_KEY -> it.value == externalTask.processDefinitionKey
           CommonRestrictions.PROCESS_DEFINITION_ID -> it.value == externalTask.processDefinitionId
@@ -133,9 +137,11 @@ class SubscribingServiceTaskDelivery(
     val taskSubscriptionHandle = subscriptionRepository.deactivateSubscriptionForTask(taskId = taskId)
     if (taskSubscriptionHandle != null) {
       try {
-        taskSubscriptionHandle.termination.accept(
-          TaskInformation(taskId = taskId, meta = emptyMap()).withReason(TaskInformation.DELETE)
-        )
+        withThreadContextClassLoader(taskSubscriptionHandle.termination) {
+          taskSubscriptionHandle.termination.accept(
+            TaskInformation(taskId = taskId, meta = emptyMap()).withReason(TaskInformation.DELETE)
+          )
+        }
       } catch (terminationError: Exception) {
         logger.error { "PROCESS-ENGINE-OPERATON-REMOTE-046: failed cleaning up delivery state for task $taskId: ${terminationError.message}" }
       }

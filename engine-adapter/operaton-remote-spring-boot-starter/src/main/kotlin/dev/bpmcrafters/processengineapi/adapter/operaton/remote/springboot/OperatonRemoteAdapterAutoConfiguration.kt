@@ -1,6 +1,7 @@
 package dev.bpmcrafters.processengineapi.adapter.operaton.remote.springboot
 
 import dev.bpmcrafters.processengineapi.adapter.operaton.common.serialization.AdapterDataConverter
+import dev.bpmcrafters.processengineapi.adapter.operaton.common.threading.ThreadContextClassLoaderThreadFactory
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.correlation.CorrelationApiImpl
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.correlation.SignalApiImpl
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.decision.EvaluateDecisionApiImpl
@@ -20,6 +21,7 @@ import dev.bpmcrafters.processengineapi.deploy.DeploymentApi
 import dev.bpmcrafters.processengineapi.impl.task.InMemSubscriptionRepository
 import dev.bpmcrafters.processengineapi.impl.task.SubscriptionRepository
 import dev.bpmcrafters.processengineapi.process.StartProcessApi
+import dev.bpmcrafters.processengineapi.task.TaskExecutionObserver
 import dev.bpmcrafters.processengineapi.task.TaskSubscriptionApi
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
@@ -27,6 +29,7 @@ import io.toolisticon.spring.condition.ConditionalOnMissingQualifiedBean
 import jakarta.annotation.PostConstruct
 import org.camunda.community.rest.client.api.*
 import org.camunda.community.rest.variables.ValueMapper
+import org.springframework.beans.factory.ObjectProvider
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.autoconfigure.AutoConfiguration
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
@@ -51,8 +54,12 @@ class OperatonRemoteAdapterAutoConfiguration {
 
   @Bean("operaton-remote-task-subscription-api")
   @Qualifier("operaton-remote-task-subscription-api")
-  fun taskSubscriptionApi(subscriptionRepository: SubscriptionRepository): TaskSubscriptionApi = TaskSubscriptionApiImpl(
-    subscriptionRepository = subscriptionRepository
+  fun taskSubscriptionApi(
+    subscriptionRepository: SubscriptionRepository,
+    observers: ObjectProvider<TaskExecutionObserver>
+  ): TaskSubscriptionApi = TaskSubscriptionApiImpl(
+    subscriptionRepository = subscriptionRepository,
+    observers = observers.orderedStream().toList()
   )
 
   @Bean("operaton-remote-start-process-api")
@@ -119,7 +126,8 @@ class OperatonRemoteAdapterAutoConfiguration {
       adapterProperties.serviceTasks.workerThreadPoolSize,
       adapterProperties.serviceTasks.workerThreadPoolSize,
       0L, TimeUnit.MILLISECONDS,
-      LinkedBlockingQueue(adapterProperties.serviceTasks.workerThreadPoolQueueCapacity)
+      LinkedBlockingQueue(adapterProperties.serviceTasks.workerThreadPoolQueueCapacity),
+      ThreadContextClassLoaderThreadFactory(OperatonRemoteAdapterAutoConfiguration::class.java.classLoader),
     )
 
   @Bean
@@ -140,7 +148,10 @@ class OperatonRemoteAdapterAutoConfiguration {
   @Bean("operaton-remote-user-task-worker-executor")
   @Qualifier("operaton-remote-user-task-worker-executor")
   @ConditionalOnMissingQualifiedBean(beanClass = ExecutorService::class, qualifier = "operaton-remote-user-task-worker-executor")
-  fun userTaskWorkerExecutor(): ExecutorService = Executors.newFixedThreadPool(10)
+  fun userTaskWorkerExecutor(): ExecutorService = Executors.newFixedThreadPool(
+    10,
+    ThreadContextClassLoaderThreadFactory(OperatonRemoteAdapterAutoConfiguration::class.java.classLoader),
+  )
 
   /**
    * Failure retry supplier.

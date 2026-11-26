@@ -2,8 +2,10 @@ package dev.bpmcrafters.processengineapi.adapter.operaton.remote.springboot
 
 import dev.bpmcrafters.processengineapi.adapter.operaton.remote.springboot.OperatonRemoteAdapterProperties.Companion.DEFAULT_PREFIX
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 import org.springframework.validation.annotation.Validated
+import java.time.Duration
 
 @Validated
 @ConfigurationProperties(prefix = DEFAULT_PREFIX)
@@ -40,16 +42,32 @@ class OperatonRemoteAdapterProperties(
     /**
      * Fixed rate for scheduled user task delivery.
      */
+    @get:DeprecatedConfigurationProperty(replacement = "$DEFAULT_PREFIX.user-tasks.schedule-delivery-fixed-rate")
     val scheduleDeliveryFixedRateInSeconds: Long = 5L,
     /**
      * Should an initial pull be executed on startup.
      */
     val executeInitialPullOnStartup: Boolean = true,
     /**
+     * Should the initial pull run asynchronously on the user task worker executor.
+     */
+    val executeInitialPullAsync: Boolean = false,
+    /**
      * Should variables be deserialized on server?
      */
     val deserializeOnServer: Boolean = false,
-    )
+    /**
+     * Delay between scheduled deliveries, e.g. `200ms`. Takes precedence over `schedule-delivery-fixed-rate-in-seconds`. Must be at least 1ms.
+     */
+    val scheduleDeliveryFixedRate: Duration? = null,
+  ) {
+    val scheduleDeliveryIntervalInMilliseconds: Long
+      get() = (scheduleDeliveryFixedRate ?: Duration.ofSeconds(scheduleDeliveryFixedRateInSeconds)).toMillis()
+
+    init {
+      require(scheduleDeliveryFixedRate == null || scheduleDeliveryFixedRate.toMillis() > 0) { "schedule-delivery-fixed-rate must be at least 1ms, but was $scheduleDeliveryFixedRate." }
+    }
+  }
 
   /**
    * Configuration for external service task handling.
@@ -74,6 +92,7 @@ class OperatonRemoteAdapterProperties(
     /**
      * Fixed rate for scheduled user task delivery.
      */
+    @get:DeprecatedConfigurationProperty(replacement = "$DEFAULT_PREFIX.service-tasks.schedule-delivery-fixed-rate")
     val scheduleDeliveryFixedRateInSeconds: Long = 13L,
     /**
      * Delivery strategy for external service tasks.
@@ -83,6 +102,10 @@ class OperatonRemoteAdapterProperties(
      * Should an initial pull be executed on startup.
      */
     val executeInitialPullOnStartup: Boolean = true,
+    /**
+     * Should the initial pull run asynchronously on the service task worker executor.
+     */
+    val executeInitialPullAsync: Boolean = false,
     /**
      * Default initial number of retries.
      */
@@ -99,7 +122,18 @@ class OperatonRemoteAdapterProperties(
      * External task executor queue capacity.
      */
     val workerThreadPoolQueueCapacity: Int = 50,
-  )
+    /**
+     * Delay between scheduled deliveries, e.g. `200ms`. Takes precedence over `schedule-delivery-fixed-rate-in-seconds`. Must be at least 1ms.
+     */
+    val scheduleDeliveryFixedRate: Duration? = null,
+  ) {
+    val scheduleDeliveryIntervalInMilliseconds: Long
+      get() = (scheduleDeliveryFixedRate ?: Duration.ofSeconds(scheduleDeliveryFixedRateInSeconds)).toMillis()
+
+    init {
+      require(scheduleDeliveryFixedRate == null || scheduleDeliveryFixedRate.toMillis() > 0) { "schedule-delivery-fixed-rate must be at least 1ms, but was $scheduleDeliveryFixedRate." }
+    }
+  }
 
   /**
    * Strategy how the user tasks are delivered to subscriptions.
