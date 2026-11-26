@@ -150,11 +150,12 @@ class EmbeddedPullServiceTaskDelivery(
           metrics.incrementCompletedTasksCounter(lockedTask.topicName!!)
         } catch (e: Throwable) {
           val jobRetries: Int = lockedTask.retries?.minus(1) ?: retries
-          logger.error { "PROCESS-ENGINE-OPERATON-EMBEDDED-033: failing delivering task ${lockedTask.id}: ${e.message}" }
+          val failureMessage = "PROCESS-ENGINE-OPERATON-EMBEDDED-033: failing delivering task ${lockedTask.id}: ${e.message}"
+          if (jobRetries > 0) logger.warn(e) { failureMessage } else logger.error(e) { failureMessage }
           metrics.incrementFailedTasksCounter(lockedTask.topicName!!)
           try {
             externalTaskService.handleFailure(lockedTask.id, workerId, e.message, jobRetries, retryTimeoutInSeconds * 1000)
-            logger.error { "PROCESS-ENGINE-OPERATON-EMBEDDED-034: successfully failed delivering task ${lockedTask.id}: ${e.message}" }
+            logger.debug { "PROCESS-ENGINE-OPERATON-EMBEDDED-034: successfully failed delivering task ${lockedTask.id}: ${e.message}" }
           } catch (reportError: Exception) {
             logger.error(reportError) { "PROCESS-ENGINE-OPERATON-EMBEDDED-048: failed reporting the failure of task ${lockedTask.id}, it is delivered again once its lock expires." }
           } finally {
