@@ -3,6 +3,7 @@ package dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery
 import dev.bpmcrafters.processengineapi.adapter.operaton.embedded.task.delivery.pull.EmbeddedPullServiceTaskDeliveryMetrics.FetchAndLockSkipReason.QUEUE_FULL
 import dev.bpmcrafters.processengineapi.impl.task.InMemSubscriptionRepository
 import dev.bpmcrafters.processengineapi.impl.task.TaskSubscriptionHandle
+import dev.bpmcrafters.processengineapi.task.TaskInformation
 import dev.bpmcrafters.processengineapi.task.TaskType
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.kotlin.await
@@ -20,8 +21,10 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Timeout
 import org.mockito.Mockito.RETURNS_SELF
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -41,6 +44,7 @@ internal class EmbeddedPullServiceTaskDeliveryThreadingTest {
   private val workerId = "worker"
   private val slowTopic = "slow-topic"
   private val fastTopic = "fast-topic"
+  private val failingTopic = "failing-topic"
 
   private val externalTaskService = mock<ExternalTaskService>()
   private val fetchAndLockBuilder = mock<ExternalTaskQueryBuilder>()
@@ -142,7 +146,33 @@ internal class EmbeddedPullServiceTaskDeliveryThreadingTest {
     assertThat(executor.taskCount).isEqualTo(1)
   }
 
-  private fun subscribe(topic: String, action: (String) -> Unit) {
+  @Test
+  fun `task is delivered again after its failure could not be reported`() {
+    val callbacks = CopyOnWriteArrayList<String>()
+    subscribe(
+      failingTopic,
+      action = {
+        callbacks.add(TaskInformation.CREATE)
+        throw IllegalStateException("database unavailable")
+      },
+      termination = { callbacks.add(it.meta[TaskInformation.REASON]!!) }
+    )
+    doThrow(IllegalStateException("database unavailable"))
+      .whenever(externalTaskService).handleFailure(any(), any(), anyOrNull(), any(), any())
+    doReturn(listOf(lockedTask("failing", failingTopic))).whenever(fetchAndLockBuilder).execute()
+    val stillLockedFailingTask = mock<ExternalTask> { on { id } doReturn "failing" }
+    doReturn(listOf(stillLockedFailingTask)).whenever(stillLockedTasksQuery).list()
+
+    taskDelivery.refresh()
+    await untilAsserted { assertThat(callbacks).containsExactly(TaskInformation.CREATE, TaskInformation.DELETE) }
+    taskDelivery.refresh()
+
+    await untilAsserted {
+      assertThat(callbacks).containsExactly(TaskInformation.CREATE, TaskInformation.DELETE, TaskInformation.CREATE, TaskInformation.DELETE)
+    }
+  }
+
+  private fun subscribe(topic: String, termination: (TaskInformation) -> Unit = {}, action: (String) -> Unit) {
     subscriptionRepository.createTaskSubscription(
       TaskSubscriptionHandle(
         taskType = TaskType.EXTERNAL,
@@ -150,7 +180,7 @@ internal class EmbeddedPullServiceTaskDeliveryThreadingTest {
         restrictions = mapOf(),
         taskDescriptionKey = topic,
         action = { taskInformation, _ -> action(taskInformation.taskId) },
-        termination = { }
+        termination = { termination(it) }
       )
     )
   }
