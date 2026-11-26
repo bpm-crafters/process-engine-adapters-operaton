@@ -60,7 +60,12 @@ private val logger = KotlinLogging.logger {}
  * `AutoConfiguration.imports`; the adapter enabled condition intentionally applies only to these
  * adapter-facing beans, not to Operaton's own engine auto-configuration.
  */
-@AutoConfiguration
+@AutoConfiguration(
+  afterName = [
+    "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
+    "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration"
+  ]
+)
 @EnableConfigurationProperties(value = [OperatonEmbeddedAdapterProperties::class])
 @Conditional(OperatonEmbeddedAdapterEnabledCondition::class)
 class OperatonEmbeddedAdapterAutoConfiguration {
